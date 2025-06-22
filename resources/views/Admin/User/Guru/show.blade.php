@@ -62,7 +62,7 @@
                             <span class="inline-flex items-center px-3 py-1 text-xs font-medium text-purple-700 bg-purple-100 rounded-full">
                                 Guru
                             </span>
-                            @if($guru->user->last_login_at)
+                            @if($guru->user->is_logged_in)
                                 <span class="inline-flex items-center px-3 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-full">
                                     <span class="w-2 h-2 mr-1 bg-green-400 rounded-full"></span>
                                     Aktif
@@ -127,24 +127,48 @@
                         </div>
 
                         <!-- Status Keaktifan -->
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700">Status Keaktifan</label>
-                            <div class="p-3 border rounded-lg bg-gray-50">
-                                <div class="flex items-center">
-                                    @if($guru->status_keaktifan == 'Aktif')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            <span class="w-2 h-2 mr-1 bg-green-400 rounded-full"></span>
-                                            {{ $guru->status_keaktifan }}
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                            <span class="w-2 h-2 mr-1 bg-red-400 rounded-full"></span>
-                                            {{ $guru->status_keaktifan }}
-                                        </span>
-                                    @endif
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            <!-- Status Keaktifan -->
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-700">Status Keaktifan</label>
+                                <div class="p-3 border rounded-lg bg-gray-50">
+                                    <div class="flex items-center">
+                                        @if($guru->status_keaktifan == 'Aktif')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <span class="w-2 h-2 mr-1 bg-green-400 rounded-full"></span>
+                                                {{ $guru->status_keaktifan }}
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                <span class="w-2 h-2 mr-1 bg-red-400 rounded-full"></span>
+                                                {{ $guru->status_keaktifan }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Status Login -->
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-700">Status Login</label>
+                                <div class="p-3 border rounded-lg bg-gray-50">
+                                    <div class="flex items-center">
+                                        @if($guru->user->is_logged_in)
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <span class="w-2 h-2 mr-1 bg-green-400 rounded-full"></span>
+                                                Aktif
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                <span class="w-2 h-2 mr-1 bg-gray-400 rounded-full"></span>
+                                                Tidak Aktif
+                                            </span>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
 
                     <!-- Alamat (Full Width) -->

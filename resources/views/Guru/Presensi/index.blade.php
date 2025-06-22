@@ -23,8 +23,8 @@
     <!-- Main Content Card -->
     <div class="overflow-hidden bg-white border border-gray-100 rounded-sm shadow-sm">
         <!-- Form Pilih Jadwal -->
-        <div class="p-8 border-b border-gray-100">
-            <h2 class="mb-6 text-lg font-semibold text-gray-900 font-heading">Pilih Jadwal</h2>
+        <div class="p-6 border-b border-gray-100">
+            <h2 class="mb-6 text-lg font-semibold text-purple-800 font-heading">Pilih Jadwal</h2>
 
             <form action="{{ route('presensi.index') }}" method="GET">
                 <div class="grid items-end grid-cols-1 gap-4 lg:grid-cols-12">
@@ -36,7 +36,7 @@
                         <select
                             name="jadwal_id"
                             id="jadwal_id"
-                            class="w-full px-4 py-3 text-sm transition-colors bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500">
+                            class="w-full px-4 py-3 text-sm transition-colors bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 dark:bg-white dark:text-gray-900 dark:border-gray-300">
                             <option value="">Pilih jadwal pembelajaran...</option>
                             @foreach ($jadwal as $j)
                                 <option value="{{ $j->id }}" {{ request('jadwal_id') == $j->id ? 'selected' : '' }}>
@@ -50,7 +50,11 @@
                     <div class="lg:col-span-2">
                         <button
                             type="submit"
-                            class="w-full px-6 py-3 text-sm font-medium text-white transition-colors bg-purple-600 rounded-lg hover:bg-purple-700 focus:ring-2 focus:ring-purple-500/20 focus:outline-none">
+                            class="inline-flex items-center justify-center flex-1 w-full px-6 py-3 text-sm font-medium text-white transition-colors bg-purple-600 rounded-lg hover:bg-purple-700 focus:ring-2 focus:ring-purple-500/20 focus:outline-none">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
                             Tampilkan
                         </button>
                     </div>
@@ -60,16 +64,16 @@
 
         <!-- Informasi Jadwal Terpilih -->
         @if ($selectedJadwal)
-        <div class="p-8 border-b border-gray-100 bg-gradient-to-r from-purple-50/50 to-indigo-50/50">
+        <div class="p-6 border-b border-gray-100 bg-gradient-to-r from-purple-50/50 to-indigo-50/50">
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-lg font-semibold text-gray-900 font-heading">Informasi Jadwal</h2>
-                <a href="{{ route('presensi.create', ['jadwal_id' => $selectedJadwal->id]) }}"
-                   class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors bg-purple-600 rounded-lg hover:bg-purple-700 focus:ring-2 focus:ring-purple-500/20 focus:outline-none">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    Tambah Presensi
-                </a>
+                <h2 class="text-lg font-semibold text-purple-800 font-heading">Informasi Jadwal</h2>
+                <a href="{{ route('presensiJadwal.create', ['jadwalId' => $selectedJadwal->id]) }}"
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-purple-700 transition bg-purple-100 border border-purple-200 rounded-lg hover:border-purple-300 hover:bg-purple-200 focus:ring-purple-500/20 focus:outline-none">
+                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                     </svg>
+                     Tambah Presensi
+                 </a>
             </div>
 
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -97,10 +101,10 @@
         @endif
 
         <!-- Tabel Data Presensi -->
-        <div class="p-8">
-            <h2 class="mb-4 text-lg font-semibold text-gray-900 font-heading">Data Presensi</h2>
+        <div class="p-6">
+            <h2 class="mb-4 text-lg font-semibold text-purple-800 font-heading">Data Presensi</h2>
 
-            @if ($presensi->isEmpty())
+            @if (!isset($presensi) || $presensi->isEmpty())
                 <div class="py-12 text-center">
                     <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full">
                         <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,7 +135,7 @@
                         <tbody>
                             @foreach ($presensi as $index => $p)
                                 <tr class="text-sm text-gray-700 border-t hover:bg-gray-50">
-                                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $index + 1 }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $presensi->firstItem() + $loop->index }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
                                         {{ \Carbon\Carbon::parse($p->waktu_presensi)->format('d-m-Y') }}
                                     </td>
@@ -189,6 +193,9 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+                <div class="mt-4">
+                    @include('components.pagination', ['data' => $presensi])
                 </div>
             </div>
             @endif
@@ -273,4 +280,26 @@
         });
     }
 </script>
+@if (session('status') === 'success' && session('message'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: @json(session('message')),
+            showConfirmButton: false,
+            timer: 2000
+        });
+    </script>
+@endif
+
+@if (session('status') === 'error' && session('message'))
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal',
+            text: @json(session('message')),
+            showConfirmButton: true
+        });
+    </script>
+@endif
 @endsection

@@ -37,13 +37,13 @@
                         </button>
                     </form>
 
-                    <!-- Tombol Export -->
+                    {{-- <!-- Tombol Export -->
                     <button class="flex items-center w-full gap-2 px-4 py-2 font-sans text-sm font-semibold text-green-700 transition-all duration-200 border border-green-200 rounded-lg bg-green-50 hover:bg-green-100 hover:border-green-300 sm:w-auto">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
                         Export Excel
-                    </button>
+                    </button> --}}
                 </div>
 
                 <!-- Kanan: Search -->
@@ -73,7 +73,7 @@
                     <!-- Items per page -->
                     <div class="space-y-1">
                         <label for="perPage" class="block text-sm font-medium text-gray-700">Tampilkan per halaman</label>
-                        <select id="perPage" name="perPage" class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-purple-500 focus:outline-none">
+                        <select id="perPage" name="perPage" class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500">
                             @foreach([10, 25, 50, 100] as $size)
                                 <option value="{{ $size }}" {{ request('perPage') == $size ? 'selected' : '' }}>{{ $size }} data</option>
                             @endforeach
@@ -83,7 +83,7 @@
                     <!-- Status Filter -->
                     <div class="space-y-1">
                         <label for="status" class="block text-sm font-medium text-gray-700">Filter Status</label>
-                        <select id="status" name="status" class="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-purple-500 focus:outline-none">
+                        <select id="status" name="status" class="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500">
                             <option value="">Semua Status</option>
                             <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Aktif</option>
                             <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Nonaktif</option>
@@ -92,11 +92,11 @@
 
                     <!-- Sort By -->
                     <div class="w-full space-y-1 sm:w-64">
-                        <label for="sort" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Urutkan Berdasarkan</label>
+                        <label for="sort" class="block text-sm font-medium text-gray-700 dark:text-gray-700">Urutkan Berdasarkan</label>
                         <select
                             id="sort"
                             name="sort"
-                            class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:ring-purple-500 focus:outline-none"
+                            class="w-full px-3 py-2.5 text-sm border border-gray-300  rounded-lg bg-white  text-gray-700 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
                         >
                             <option value="name_asc" {{ request('sort') === 'name_asc' ? 'selected' : '' }}>Nama (A-Z)</option>
                             <option value="name_desc" {{ request('sort') === 'name_desc' ? 'selected' : '' }}>Nama (Z-A)</option>
@@ -152,12 +152,12 @@
             <table class="min-w-full bg-white rounded shadow-md">
                 <thead>
                     <tr class="text-sm font-semibold text-gray-700 bg-gray-100 font-heading">
-                        <th class="px-4 py-3 text-left whitespace-nowrap">No</th>
-                        <th class="px-4 py-3 text-left whitespace-nowrap">NIP</th>
-                        <th class="px-4 py-3 text-left whitespace-nowrap">Nama</th>
-                        <th class="px-4 py-3 text-left whitespace-nowrap">Email</th>
-                        <th class="px-4 py-3 text-left whitespace-nowrap">Status Login</th>
-                        <th class="px-4 py-3 text-left whitespace-nowrap">Aksi</th>
+                        <th class="px-4 py-3 text-left uppercase whitespace-nowrap">No</th>
+                        <th class="px-4 py-3 text-left uppercase whitespace-nowrap">NIP</th>
+                        <th class="px-4 py-3 text-left uppercase whitespace-nowrap">Nama</th>
+                        <th class="px-4 py-3 text-left uppercase whitespace-nowrap">Email</th>
+                        <th class="px-4 py-3 text-left uppercase whitespace-nowrap">Status Login</th>
+                        <th class="px-4 py-3 text-left uppercase whitespace-nowrap">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -284,20 +284,28 @@
             }
         });
     }
-
-    @if(session('success'))
+</script>
+@if (session('status') === 'success' && session('message'))
+    <script>
         Swal.fire({
             icon: 'success',
             title: 'Berhasil',
-            text: '{{ session("success") }}'
+            text: @json(session('message')),
+            showConfirmButton: false,
+            timer: 2000
         });
-    @elseif(session('error'))
+    </script>
+@endif
+
+@if (session('status') === 'error' && session('message'))
+    <script>
         Swal.fire({
             icon: 'error',
             title: 'Gagal',
-            text: '{{ session("error") }}'
+            text: @json(session('message')),
+            showConfirmButton: true
         });
-    @endif
-</script>
+    </script>
+@endif
 
 @endsection

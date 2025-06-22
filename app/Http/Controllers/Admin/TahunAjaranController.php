@@ -14,7 +14,6 @@ class TahunAjaranController extends Controller
      */
     public function index(Request $request)
     {
-        // Cek apakah pengguna adalah admin
         $user = $request->user();
 
         if (!$user || !$user->hasRole('admin')) {
@@ -25,10 +24,9 @@ class TahunAjaranController extends Controller
             ]);
         }
 
-        // Mulai query
         $tahunAjaranQuery = TahunAjaran::query();
 
-        // Sorting berdasarkan request
+        // Sorting
         switch ($request->sort) {
             case 'created_asc':
                 $tahunAjaranQuery->orderBy('created_at', 'asc');
@@ -37,7 +35,7 @@ class TahunAjaranController extends Controller
                 $tahunAjaranQuery->orderBy('created_at', 'desc');
                 break;
             default:
-                $tahunAjaranQuery->latest(); // default: by created_at desc
+                $tahunAjaranQuery->latest();
                 break;
         }
 
@@ -46,12 +44,12 @@ class TahunAjaranController extends Controller
             $tahunAjaranQuery->where('status', $request->status);
         }
 
-        // Filter berdasarkan tahun mulai
+        // Filter berdasarkan tahun_mulai dari kolom tahun_ajaran (format: 2024/2025)
         if ($request->filled('tahun_mulai')) {
-            $tahunAjaranQuery->whereYear('tanggal_mulai', $request->tahun_mulai);
+            $tahunAjaranQuery->whereRaw('SUBSTRING_INDEX(tahun_ajaran, "/", 1) = ?', [$request->tahun_mulai]);
         }
 
-        // Search by tahun_ajaran atau status
+        // Pencarian
         if ($request->filled('search')) {
             $tahunAjaranQuery->where(function ($query) use ($request) {
                 $query->where('tahun_ajaran', 'like', '%' . $request->search . '%')
@@ -59,27 +57,26 @@ class TahunAjaranController extends Controller
             });
         }
 
-        // Ambil data terfilter dan paginasi
         $tahunAjaran = $tahunAjaranQuery->paginate(10);
-
-        // Tambahkan parameter filter ke pagination
         $tahunAjaran->appends($request->only(['status', 'tahun_mulai', 'search', 'sort']));
 
-        // Ambil daftar tahun untuk dropdown filter tahun mulai
-        $tahunList = TahunAjaran::selectRaw('YEAR(tanggal_mulai) as tahun')
-            ->distinct()
+        // Ambil list tahun_mulai dari tahun_ajaran
+        $tahunList = TahunAjaran::selectRaw('DISTINCT SUBSTRING_INDEX(tahun_ajaran, "/", 1) AS tahun')
             ->orderBy('tahun', 'desc')
             ->pluck('tahun');
 
-        return view('admin.akademik.tajaran.index', compact('tahunAjaran', 'user', 'tahunList'));
+        $activeCount = TahunAjaran::where('status', 'Aktif')->count();
+        return view('admin.akademik.tajaran.index', compact('tahunAjaran', 'user', 'tahunList', 'activeCount'));
     }
+
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-        return view('admin.akademik.tajaran.create');
+        $ta = TahunAjaran::all();
+        return view('admin.akademik.tajaran.create', compact('ta'));
     }
 
     /**
@@ -88,39 +85,46 @@ class TahunAjaranController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'tahun_ajaran' => 'required|string|max:255|unique:tahun_ajaran,tahun_ajaran',
-            'tanggal_mulai' => 'required|date',
-            'tanggal_selesai' => 'required|date',
-            'status' => 'nullable|in:Aktif,Tidak Aktif'
+            'tahun_mulai' => 'required|integer|min:2000|max:2099',
+            'tahun_akhir' => 'required|integer|min:2001|max:2100|gt:tahun_mulai',
         ], [
-            'tahun_ajaran.required' => 'Tahun ajaran wajib diisi.',
-            'tanggal_mulai.required' => 'Tanggal mulai wajib diisi.',
-            'tanggal_selesai.required' => 'Tanggal selesai wajib diisi.',
+            'tahun_mulai.required' => 'Tahun mulai wajib diisi.',
+            'tahun_akhir.required' => 'Tahun akhir wajib diisi.',
+            'tahun_akhir.gt' => 'Tahun akhir harus lebih besar dari tahun mulai.',
         ]);
 
         try {
-            $tahunajaran = new TahunAjaran();
-            $tahunajaran->tahun_ajaran = $request->tahun_ajaran;
-            $tahunajaran->tanggal_mulai = $request->tanggal_mulai;
-            $tahunajaran->tanggal_selesai = $request->tanggal_selesai;
-            $tahunajaran->status = $request->has('status') ? 'Aktif' : 'Tidak Aktif'; // Checkbox toggle
+            $tahun_ajaran = $request->tahun_mulai . '/' . $request->tahun_akhir;
 
+            // Validasi unik manual karena tahun_ajaran gabungan dari 2 input
+            $exists = TahunAjaran::where('tahun_ajaran', $tahun_ajaran)->exists();
+            if ($exists) {
+                return redirect()->back()->withInput()->with([
+                    'status' => 'error',
+                    'message' => 'Tahun ajaran sudah ada.'
+                ]);
+            }
+
+            // Set semua tahun ajaran lain menjadi Tidak Aktif
+            TahunAjaran::where('status', 'Aktif')->update(['status' => 'Tidak Aktif']);
+
+            // Simpan tahun ajaran baru sebagai Aktif
+            $tahunajaran = new TahunAjaran();
+            $tahunajaran->tahun_ajaran = $tahun_ajaran;
+            $tahunajaran->status = 'Aktif';
             $tahunajaran->save();
 
-            // Menggunakan SweetAlert untuk sukses
             return redirect()->route('tahunajaran.index')->with([
                 'status' => 'success',
-                'message' => 'Tahun ajaran berhasil ditambahkan.'
+                'message' => 'Tahun ajaran berhasil ditambahkan dan diatur sebagai aktif.'
             ]);
         } catch (\Exception $e) {
-            // Menggunakan SweetAlert untuk error
             return redirect()->route('tahunajaran.index')->with([
                 'status' => 'error',
                 'message' => 'Terjadi kesalahan saat menambahkan tahun ajaran.'
             ]);
         }
     }
-
 
 
     /**
@@ -160,39 +164,44 @@ class TahunAjaranController extends Controller
     public function update(Request $request, TahunAjaran $tahunajaran)
     {
         $request->validate([
-            'tahun_ajaran' => 'required|string|max:255',
-            'tanggal_mulai' => 'required|date',
-            'tanggal_selesai' => 'required|date',
-            'status' => 'nullable|in:Aktif,Tidak Aktif'
+            'tahun_mulai' => 'required|integer|min:2000|max:2099',
+            'tahun_akhir' => 'required|integer|min:2001|max:2100|gt:tahun_mulai',
         ], [
-            'tahun_ajaran.required' => 'Tahun ajaran wajib diisi.',
-            'tanggal_mulai.required' => 'Tanggal mulai wajib diisi.',
-            'tanggal_selesai.required' => 'Tanggal selesai wajib diisi.',
+            'tahun_mulai.required' => 'Tahun mulai wajib diisi.',
+            'tahun_akhir.required' => 'Tahun akhir wajib diisi.',
+            'tahun_akhir.gt' => 'Tahun akhir harus lebih besar dari tahun mulai.',
         ]);
 
         try {
-            $tahunajaran->tahun_ajaran = $request->tahun_ajaran;
-            $tahunajaran->tanggal_mulai = $request->tanggal_mulai;
-            $tahunajaran->tanggal_selesai = $request->tanggal_selesai;
-            // Jika ada status aktif
-            $tahunajaran->status = $request->has('status') ? 'Aktif' : 'Tidak Aktif';
+            $tahun_ajaran = $request->tahun_mulai . '/' . $request->tahun_akhir;
 
+            // Cek apakah kombinasi tahun ajaran sudah digunakan oleh entri lain
+            $exists = TahunAjaran::where('tahun_ajaran', $tahun_ajaran)
+                ->where('id', '!=', $tahunajaran->id)
+                ->exists();
+
+            if ($exists) {
+                return redirect()->back()->withInput()->with([
+                    'status' => 'error',
+                    'message' => 'Tahun ajaran sudah ada.'
+                ]);
+            }
+
+            $tahunajaran->tahun_ajaran = $tahun_ajaran;
+            // Status tidak diubah saat update
             $tahunajaran->save();
 
-            // Menggunakan SweetAlert untuk sukses
             return redirect()->route('tahunajaran.index')->with([
                 'status' => 'success',
                 'message' => 'Tahun ajaran berhasil diperbarui.'
             ]);
         } catch (\Exception $e) {
-            // Menggunakan SweetAlert untuk error
             return redirect()->route('tahunajaran.index')->with([
                 'status' => 'error',
                 'message' => 'Terjadi kesalahan saat memperbarui tahun ajaran.'
             ]);
         }
     }
-
 
 
     /**
@@ -222,7 +231,18 @@ class TahunAjaranController extends Controller
     public function toggleStatus($id)
     {
         $ta = TahunAjaran::findOrFail($id);
-        $ta->status = $ta->status === 'Aktif' ? 'Tidak Aktif' : 'Aktif';
+
+        if ($ta->status === 'Tidak Aktif') {
+            // Nonaktifkan semua dulu
+            TahunAjaran::where('status', 'Aktif')->update(['status' => 'Tidak Aktif']);
+
+            // Aktifkan tahun ajaran yang dipilih
+            $ta->status = 'Aktif';
+        } else {
+            // Nonaktifkan tahun ajaran ini
+            $ta->status = 'Tidak Aktif';
+        }
+
         $ta->save();
 
         return response()->json([
@@ -231,5 +251,6 @@ class TahunAjaranController extends Controller
             'status' => $ta->status
         ]);
     }
+
 
 }

@@ -42,7 +42,7 @@
                             value="{{ old('nama_kelas' ,isset($room) ? $room->nama_kelas : '') }}"
                             required
                             placeholder="Contoh: 7A Reguler"
-                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
+                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
                         />
                         @error('nama_kelas')
                             <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
@@ -62,11 +62,11 @@
                             name="jenis_kelas"
                             id="jenis_kelas"
                             required
-                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
+                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
                         >
-                            <option value="" disabled {{ old('jenis_kelas') == '' ? 'selected' : '' }}>Pilih Jenis Kelas</option>
-                            <option value="Reguler" {{ old('jenis_kelas') == 'Reguler' ? 'selected' : '' }}>Reguler</option>
-                            <option value="Tahfidz" {{ old('jenis_kelas') == 'Tahfidz' ? 'selected' : '' }}>Tahfidz</option>
+                            <option value="" disabled {{ old('jenis_kelas', $room->jenis_kelas ?? '') == '' ? 'selected' : '' }}>Pilih Jenis Kelas</option>
+                            <option value="Reguler" {{ old('jenis_kelas', $room->jenis_kelas ?? '') == 'Reguler' ? 'selected' : '' }}>Reguler</option>
+                            <option value="Tahfidz" {{ old('jenis_kelas', $room->jenis_kelas ?? '') == 'Tahfidz' ? 'selected' : '' }}>Tahfidz</option>
                         </select>
                         @error('jenis_kelas')
                             <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
@@ -86,12 +86,12 @@
                             name="tingkatan_kelas"
                             id="tingkatan_kelas"
                             required
-                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
+                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
                         >
-                            <option value="" disabled {{ old('tingkatan_kelas') == '' ? 'selected' : '' }}>Pilih Tingkatan Kelas</option>
-                            <option value="7" {{ old('tingkatan_kelas') == '7' ? 'selected' : '' }}>7</option>
-                            <option value="8" {{ old('tingkatan_kelas') == '8' ? 'selected' : '' }}>8</option>
-                            <option value="9" {{ old('tingkatan_kelas') == '9' ? 'selected' : '' }}>9</option>
+                            <option value="" disabled {{ old('tingkatan_kelas', $room->tingkatan_kelas ?? '') == '' ? 'selected' : '' }}>Pilih Tingkatan Kelas</option>
+                            <option value="7" {{ old('tingkatan_kelas', $room->tingkatan_kelas ?? '') == '7' ? 'selected' : '' }}>7</option>
+                            <option value="8" {{ old('tingkatan_kelas', $room->tingkatan_kelas ?? '') == '8' ? 'selected' : '' }}>8</option>
+                            <option value="9" {{ old('tingkatan_kelas', $room->tingkatan_kelas ?? '') == '9' ? 'selected' : '' }}>9</option>
                         </select>
                         @error('tingkatan_kelas')
                             <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
@@ -111,7 +111,7 @@
                             name="guru"
                             id="guru"
                             required
-                            class="w-full px-4 py-3 mb-4 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
+                            class="w-full px-4 py-3 mb-4 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
                         >
                             <option value="" disabled {{ old('guru') == '' ? 'selected' : '' }}>Pilih Wali Kelas</option>
                             @foreach ($guruList as $guru)

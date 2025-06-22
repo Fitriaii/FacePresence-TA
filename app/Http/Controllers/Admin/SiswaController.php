@@ -9,6 +9,7 @@ use App\Models\Siswa_Kelas;
 use App\Models\TahunAjaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -134,34 +135,37 @@ class SiswaController extends Controller
         try {
             DB::beginTransaction();
 
-            // 1. Buat dulu data siswa_kelas tanpa siswa_id
-            $siswaKelas = new Siswa_Kelas();
-            $siswaKelas->kelas_id = $request->kelas_id;
-            $siswaKelas->tahun_ajaran_id = $request->tahun_ajaran_id;
-            $siswaKelas->save();
-
-            // 2. Baru simpan data siswa, isi siswa_kelas_id dengan id yang baru dibuat
+            // 1. Simpan data siswa
             $siswa = new Siswa();
             $siswa->nama_siswa = $request->nama_siswa;
             $siswa->nis = $request->nis;
             $siswa->jenis_kelamin = $request->jenis_kelamin;
-            $siswa->siswa_kelas_id = $siswaKelas->id;
             $siswa->save();
 
-            // 3. Setelah siswa berhasil disimpan, update siswa_id pada siswa_kelas
+            // 2. Simpan ke relasi siswa_kelas
+            $siswaKelas = new Siswa_Kelas();
             $siswaKelas->siswa_id = $siswa->id;
+            $siswaKelas->kelas_id = $request->kelas_id;
+            $siswaKelas->tahun_ajaran_id = $request->tahun_ajaran_id;
             $siswaKelas->save();
 
             DB::commit();
 
-            Alert::success('Berhasil', 'Siswa berhasil ditambahkan.');
-            return redirect()->route('siswa.index');
+            return redirect()->route('siswa.index')->with([
+                'status' => 'success',
+                'message' => 'Siswa berhasil ditambahkan.'
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Alert::error('Gagal', 'Terjadi kesalahan saat menambahkan siswa: ' . $e->getMessage());
-            return redirect()->route('siswa.index');
+
+            return redirect()->route('siswa.index')->with([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat menambahkan siswa: ' . $e->getMessage()
+            ]);
         }
     }
+
+
 
     /**
      * Display the specified resource.
@@ -186,14 +190,14 @@ class SiswaController extends Controller
      */
     public function edit(Siswa $siswa)
     {
-        $kelasList = Kelas::all();
+        $siswaKelas = $siswa->siswa_kelas()->first();
         $activeTahunAjaran = TahunAjaran::where('status', 'aktif')->first();
-
+        $kelasList = Kelas::all();
         if (!$activeTahunAjaran) {
             Alert::error('Gagal', 'Tidak ada tahun ajaran aktif. Silakan atur tahun ajaran terlebih dahulu.');
             return redirect()->route('siswa.index');
         }
-        return view('Admin.Siswa.edit', compact('siswa', 'kelasList', 'activeTahunAjaran'));
+        return view('Admin.Siswa.edit', compact('siswa', 'siswaKelas', 'activeTahunAjaran', 'kelasList'));
     }
 
 
@@ -204,7 +208,7 @@ class SiswaController extends Controller
     {
         $request->validate([
             'nama_siswa' => 'required|string|max:255',
-            'nis' => 'required|string|max:255|unique:siswa,nis,' . $siswa->id, // pastikan NIS tidak bentrok
+            'nis' => 'required|string|max:255|unique:siswa,nis,' . $siswa->id,
             'jenis_kelamin' => 'required|in:Laki-Laki,Perempuan',
             'kelas_id' => 'required|exists:kelas,id',
             'tahun_ajaran_id' => 'required|exists:tahun_ajaran,id',
@@ -212,8 +216,12 @@ class SiswaController extends Controller
             'nama_siswa.required' => 'Nama siswa wajib diisi.',
             'nis.required' => 'NIS wajib diisi.',
             'nis.unique' => 'NIS sudah digunakan.',
+            'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
+            'jenis_kelamin.in' => 'Jenis kelamin harus Laki-Laki atau Perempuan.',
             'kelas_id.required' => 'Kelas wajib dipilih.',
+            'kelas_id.exists' => 'Kelas tidak ditemukan.',
             'tahun_ajaran_id.required' => 'Tahun ajaran wajib dipilih.',
+            'tahun_ajaran_id.exists' => 'Tahun ajaran tidak valid.',
         ]);
 
         try {
@@ -225,23 +233,26 @@ class SiswaController extends Controller
             $siswa->jenis_kelamin = $request->jenis_kelamin;
             $siswa->save();
 
-            // Update data siswa_kelas jika ada perubahan
-            $siswaKelas = $siswa->siswa_kelas;
-            $siswaKelas->kelas_id = $request->kelas_id;
-            $siswaKelas->tahun_ajaran_id = $request->tahun_ajaran_id;
-            $siswaKelas->save();
+            // Update relasi siswa_kelas
+            $siswaKelas = $siswa->siswa_kelas()->first();
+            if ($siswaKelas) {
+                $siswaKelas->kelas_id = $request->kelas_id;
+                $siswaKelas->tahun_ajaran_id = $request->tahun_ajaran_id;
+                $siswaKelas->save();
+            }
 
             DB::commit();
 
             return redirect()->route('siswa.index')->with([
                 'status' => 'success',
-                'message' => 'Siswa berhasil diperbarui.'
+                'message' => 'Data siswa berhasil diperbarui.'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return redirect()->route('siswa.index')->with([
                 'status' => 'error',
-                'message' => 'Terjadi kesalahan saat memperbarui data siswa: ' . $e->getMessage()
+                'message' => 'Terjadi kesalahan saat memperbarui siswa: ' . $e->getMessage()
             ]);
         }
     }
@@ -266,8 +277,6 @@ class SiswaController extends Controller
             ]);
         }
     }
-
-
     public function showCaptureForm(string $id)
     {
         $siswa = Siswa::findOrFail($id);
@@ -287,120 +296,116 @@ class SiswaController extends Controller
         $nis = $siswa->nis;
         $folder = "faces/{$nis}";
 
-        // Hapus gambar lama jika ada
         try {
+            // Bersihkan folder lama
             if (Storage::disk('public')->exists($folder)) {
-                $existingFiles = Storage::disk('public')->files($folder);
-                Storage::disk('public')->delete($existingFiles);
-                Log::info("Gambar lama dihapus untuk NIS {$nis}");
-            } else {
-                Storage::disk('public')->makeDirectory($folder);
-                Log::info("Folder dibuat untuk NIS {$nis}");
+                Storage::disk('public')->deleteDirectory($folder);
+                Log::info("Folder lama dihapus: {$folder}");
             }
+            Storage::disk('public')->makeDirectory($folder);
+            Log::info("Folder baru dibuat: {$folder}");
         } catch (\Exception $e) {
-            Log::error("Gagal menghapus/membuat folder untuk NIS {$nis}: " . $e->getMessage());
+            Log::error("Gagal buat folder: " . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'Gagal menyiapkan folder penyimpanan.',
             ], 500);
         }
 
-        // Simpan gambar baru
+        // Simpan gambar dan buat path
         $paths = [];
-        foreach ($images as $i => $imgData) {
+        foreach ($images as $index => $imgData) {
             try {
-                $image = base64_decode(str_replace('data:image/png;base64,', '', $imgData));
-                $filename = "$folder/pose_{$i}.png";
+                // Hitung posisi dan index gambar
+                $position = floor($index / 5); // 5 gambar per posisi
+                $i = $index % 5;
+
+                $image = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imgData));
+                $filename = "$folder/pose_{$position}_{$i}.png";
                 Storage::disk('public')->put($filename, $image);
-                $paths[] = $filename;
 
                 if (!Storage::disk('public')->exists($filename)) {
-                    Log::error("Gambar pose_{$i}.png gagal disimpan untuk NIS {$nis}");
+                    Log::error("Gagal menyimpan: $filename");
                     return response()->json([
                         'status' => 'error',
-                        'message' => "Gagal menyimpan gambar pose_{$i}.png",
-                        'filename' => $filename
+                        'message' => "Gagal menyimpan gambar ke storage.",
                     ]);
                 }
 
-                Log::info("Gambar pose_{$i}.png berhasil disimpan untuk NIS {$nis}");
+                $paths[] = $filename;
+                Log::info("Gambar disimpan: $filename");
+
             } catch (\Exception $e) {
-                Log::error("Error saat menyimpan gambar pose_{$i}.png untuk NIS {$nis}: " . $e->getMessage());
+                Log::error("Gagal simpan gambar ke storage: " . $e->getMessage());
                 return response()->json([
                     'status' => 'error',
-                    'message' => "Terjadi kesalahan saat menyimpan gambar pose_{$i}.png",
+                    'message' => "Gagal menyimpan gambar ke storage.",
                 ]);
             }
         }
 
-        // Simpan path ke DB
+        // Simpan ke DB
         try {
             $siswa->foto_siswa = json_encode($paths);
             $siswa->save();
-            $nisFile = storage_path("app/public/faces/nis.txt");
-            file_put_contents($nisFile, $nis);
-            if (!file_exists($nisFile)) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'File NIS gagal dibuat!',
-                    'path' => $nisFile
-                ]);
-            }
-            $storedFiles = Storage::disk('public')->files("faces/{$nis}");
-            if (empty($storedFiles)) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Gagal: tidak ada gambar tersimpan di storage.',
-                    'folder' => "faces/{$nis}"
-                ]);
-            }
-            Log::info("Path gambar disimpan ke DB untuk NIS {$nis}");
+            Log::info("Path disimpan ke DB untuk NIS {$nis}");
         } catch (\Exception $e) {
-            Log::error("Gagal menyimpan path gambar ke DB untuk NIS {$nis}: " . $e->getMessage());
+            Log::error("Gagal simpan DB: " . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'Gagal menyimpan data ke database.',
             ], 500);
         }
 
-        // Jalankan script training global
-        $pythonScript = base_path('python/face_train.py');
-        $process = new Process(['python', $pythonScript, $nisFile]);
-        $process->run();
+        // Buat URL publik agar bisa diakses Flask
+        $imageUrls = array_map(function ($path) {
+            return asset('storage/' . $path);
+        }, $paths);
 
-        if (!$process->isSuccessful()) {
-            Log::error("Training gagal untuk NIS {$nis}: " . $process->getErrorOutput());
+        // Kirim ke Flask untuk training
+        try {
+            $response = Http::timeout(30)->post('http://127.0.0.1:5000/face-train', [
+                'nis' => $nis,
+                'image_urls' => $imageUrls,
+            ]);
+
+            if (!$response->ok()) {
+                Log::error("Flask error: " . $response->body());
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Flask tidak merespon OK.',
+                    'flask_response' => $response->body(),
+                ], 500);
+            }
+
+            $data = $response->json();
+            if ($data['status'] !== 'success') {
+                Log::error("Training gagal: " . json_encode($data));
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Training gagal di Flask.',
+                    'detail' => $data,
+                ], 500);
+            }
+
+            Log::info("Training sukses di Flask untuk NIS {$nis}");
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Capture & training berhasil!',
+                'label_map' => $data['label_map'] ?? null,
+                'redirect' => route('siswa.index'),
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Gagal koneksi ke Flask: " . $e->getMessage());
             return response()->json([
                 'status' => 'error',
-                'message' => 'Training gagal',
-                'output' => $process->getOutput(),
-                'error' => $process->getErrorOutput(),
-                'file_path' => $nisFile
+                'message' => 'Tidak dapat menghubungi API Flask.',
+                'error' => $e->getMessage(),
             ], 500);
         }
-
-        Log::info("Training berhasil dijalankan untuk NIS {$nis}");
-
-        // Cek hasil model global
-        $modelPath = storage_path("app/public/faces/face_models/traineer.yml");
-        $labelPath = storage_path("app/public/faces/face_models/labels_map.pkl");
-
-        if (!file_exists($modelPath) || !file_exists($labelPath)) {
-            Log::error("Model atau label tidak ditemukan setelah training untuk NIS {$nis}");
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Model atau label tidak ditemukan setelah training.',
-            ], 500);
-        }
-
-        Log::info("Capture & training selesai untuk NIS {$nis}");
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Capture & training selesai!',
-            'redirect' => route('siswa.index')
-        ]);
     }
+
+
 
 
 

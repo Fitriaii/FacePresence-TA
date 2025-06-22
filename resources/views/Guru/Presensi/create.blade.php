@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('content')
@@ -20,7 +19,7 @@
 
     <div class="z-50 p-6 mb-6 bg-white rounded-sm shadow-lg font-heading">
         <div class="mb-6">
-            <h2 class="mb-6 text-lg font-bold text-purple-800 font-heading">Tambah Presensi</h2>
+            <h2 class="mb-6 text-lg font-bold text-purple-800 font-heading">Detail Jadwal</h2>
 
             <div class="grid grid-cols-1 gap-6">
                 <div class="flex items-center gap-4">
@@ -68,20 +67,16 @@
         <div class="mb-6">
             <h2 class="mb-6 text-lg font-bold text-purple-800 font-heading">Form Presensi</h2>
 
-            <!-- Form Presensi -->
             <div class="mb-6 space-x-8" x-data="{ tab: 'kamera' }">
-                {{-- <input type="hidden" name="jadwal_id" value="{{ $jadwal->id }}"> --}}
 
-                <!-- Pilihan Tab -->
                 <div class="flex flex-wrap mb-4 border-b border-gray-200">
                     <button
                         type="button"
                         @click="tab = 'kamera'"
                         :class="tab === 'kamera' ? 'text-purple-600 border-purple-600' : 'text-gray-600 border-transparent '"
                         class="flex items-center gap-2 px-6 py-2 text-sm font-medium border-b-2 focus:outline-none">
-                        <!-- Ikon -->
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134-.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
                         </svg>
                         Presensi Kamera
@@ -99,7 +94,6 @@
                     </button>
                 </div>
 
-                <!-- Input Waktu Presensi -->
                 <div class="flex items-center gap-4 mb-4">
                     <label class="w-48 text-sm font-medium text-black">Waktu Presensi <span class="ml-1 font-semibold">:</span></label>
                     <input
@@ -108,35 +102,29 @@
                         id="waktu_presensi"
                         class="px-4 py-2 text-sm text-black border border-gray-400 rounded outline-none w-60 bg-inherit hover:border-purple-600 focus:border-purple-600"
                         value="{{ old('waktu_presensi', \Carbon\Carbon::now()->format('Y-m-d\TH:i')) }}"
-                        required>
+                        required
+                        :readonly="tab === 'kamera'"
+                    >
                     @error('waktu_presensi')
                         <div class="mt-1 text-sm text-red-500">{{ $message }}</div>
                     @enderror
                 </div>
 
-                <!-- Tab Konten: Kamera -->
-                <div x-show="tab === 'kamera'" class="mb-6">
+                <div x-show="tab === 'kamera'">
                     <div class="mb-6">
                         <div id="videoWrapper" class="relative flex flex-col items-center justify-center max-w-2xl mx-auto bg-gray-900 rounded-lg shadow-lg video-container aspect-video" data-jadwal-id="{{ $jadwal->id }}">
 
-                            <!-- Status indicator -->
                             <div id="statusIndicator" class="status-indicator"></div>
 
-                            <!-- Recognition stats -->
                             <div id="recognitionStats" class="hidden recognition-stats">
                                 <div>FPS: <span id="fpsCounter">0</span></div>
                                 <div>Deteksi: <span id="detectionCount">0</span></div>
                             </div>
 
-                            <!-- Video element -->
                             <video id="video" autoplay muted class="object-cover w-full h-full rounded-sm"></video>
 
-                            <!-- Scanning line overlay -->
                             <div id="scanningLine" class="hidden scanning-line"></div>
 
-                            <!-- Face detection frames will be added here dynamically -->
-
-                            <!-- Overlay jika kamera belum aktif -->
                             <div id="cameraOverlay" class="absolute inset-0 flex flex-col items-center justify-center text-white transition-all duration-500 rounded-lg bg-gradient-to-br from-gray-800 to-gray-900">
                                 <div class="text-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto mb-4 text-gray-400 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -148,15 +136,13 @@
                                 </div>
                             </div>
 
-                            <!-- Canvas untuk proses face recognition -->
                             <canvas id="canvas" class="hidden"></canvas>
                         </div>
 
-                        <!-- Tombol kontrol -->
                         <div class="flex justify-center gap-3 mt-6">
                             <button type="button" class="px-6 py-3 text-sm font-semibold text-white rounded-lg shadow-lg btn-primary disabled:opacity-50 disabled:cursor-not-allowed" id="start-recognition">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.5a2.5 2.5 0 002.5-2.5V6a2.5 2.5 0 00-2.5-2.5H9m12 0H9m12 0a2 2 0 012 2v9a2 2 0 01-2 2h-1M9 3.5a2 2 0 00-2 2v9a2 2 0 002 2h1m10.5-11.5H21m-10.5 0H9"/>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="inline w-4 h-4 mr-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
                                 </svg>
                                 Nyalakan Kamera
                             </button>
@@ -165,43 +151,61 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                 </svg>
-                                Deteksi Wajah
+                                Deteksi Wajah Sekarang
                             </button>
                             <button type="button" class="px-6 py-3 text-sm font-semibold text-white rounded-lg shadow-lg btn-danger disabled:opacity-50 disabled:cursor-not-allowed" id="stop-recognition" disabled>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="inline w-4 h-4 mr-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M12 18.75H4.5a2.25 2.25 0 0 1-2.25-2.25V9m12.841 9.091L16.5 19.5m-1.409-1.409c.407-.407.659-.97.659-1.591v-9a2.25 2.25 0 0 0-2.25-2.25h-9c-.621 0-1.184.252-1.591.659m12.182 12.182L2.909 5.909M1.5 4.5l1.409 1.409" />
                                 </svg>
                                 Matikan Kamera
                             </button>
                         </div>
 
-                        <!-- Mode toggle -->
                         <div class="flex justify-center mt-4">
-                            <div class="p-1 bg-gray-100 rounded-lg">
-                                <button id="autoMode" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-md shadow-sm hover:bg-gray-50">
-                                    Mode Otomatis
-                                </button>
-                                <button id="manualMode" class="px-4 py-2 text-sm font-medium text-gray-500 rounded-md hover:text-gray-700">
-                                    Mode Manual
-                                </button>
+                            <div id="modeStatus" class="px-4 py-2 text-sm font-medium text-blue-800 bg-blue-100 border border-blue-200 rounded-full">
+                                Mode Otomatis Aktif
                             </div>
                         </div>
-
-                        <div class="mt-4 text-center">
-                            <small class="text-gray-500">
-                                <span class="inline-block w-2 h-2 mr-2 bg-green-500 rounded-full"></span>
-                                Sistem akan menandai kehadiran siswa berdasarkan wajah yang dikenali dengan tingkat akurasi tinggi
-                            </small>
+                        <div class="mt-4">
+                            <div class="w-full p-4 border border-blue-200 rounded-lg bg-blue-50">
+                                <div class="flex items-start gap-3">
+                                    <div class="flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="mb-1 text-sm font-semibold text-blue-800">Deteksi Wajah Otomatis (dan Manual)</h4>
+                                        <p class="mb-2 text-sm text-blue-700">
+                                            Sistem akan secara otomatis mendeteksi wajah setiap beberapa detik dan mencatat presensi jika dikenali. Anda juga bisa menekan "Deteksi Wajah Sekarang" untuk pemicuan manual.
+                                        </p>
+                                        <div class="flex flex-wrap gap-3 text-xs text-blue-600">
+                                            <span class="flex items-center gap-1">
+                                                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                                                Deteksi otomatis berkala
+                                            </span>
+                                            <span class="flex items-center gap-1">
+                                                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                                                Pemicu deteksi manual
+                                            </span>
+                                            <span class="flex items-center gap-1">
+                                                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                                                Fleksibel
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Tab Konten: Manual -->
                 <form x-show="tab === 'manual'" action="{{ route('presensi.manual.simpan') }}" method="POST" class="space-y-4">
                     @csrf
 
                     <input type="hidden" name="jadwal_id" value="{{ $jadwal->id }}">
-                    <input type="hidden" name="waktu_presensi" value="{{ now() }}">
+                    {{-- Waktu presensi untuk manual diisi dari JS atau biarkan user pilih --}}
+                    {{-- <input type="hidden" name="waktu_presensi" value="{{ now() }}"> --}}
 
                     <div class="mt-2 overflow-auto rounded-sm shadow-sm">
                         <table class="min-w-full bg-white rounded shadow-md">
@@ -263,7 +267,7 @@
                                 </tr>
                                 @empty
                                 <tr class="text-sm text-gray-500">
-                                    <td colspan="5" class="px-4 py-3 text-center">Tidak ada data presensi yang ditemukan.</td>
+                                    <td colspan="8" class="px-4 py-3 text-center">Tidak ada data siswa ditemukan untuk kelas ini.</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -286,13 +290,9 @@
                         </button>
                     </div>
                 </form>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 <style>
@@ -343,12 +343,12 @@
         width: 12px;
         height: 12px;
         border-radius: 50%;
-        background: #ef4444;
+        background: #ef4444; /* Merah untuk tidak aktif */
         animation: pulse 2s infinite;
     }
 
     .status-indicator.active {
-        background: #10b981;
+        background: #10b981; /* Hijau untuk aktif */
     }
 
     @keyframes pulse {
@@ -416,51 +416,26 @@
     const recognitionStats = document.getElementById('recognitionStats');
     const fpsCounter = document.getElementById('fpsCounter');
     const detectionCount = document.getElementById('detectionCount');
-    const autoModeBtn = document.getElementById('autoMode');
-    const manualModeBtn = document.getElementById('manualMode');
+    const waktuPresensiInput = document.getElementById('waktu_presensi');
+
+    const BLUR_THRESHOLD = 100;
+    const BRIGHTNESS_THRESHOLD = 60;
+    const AUTO_DETECTION_INTERVAL_MS = 3000;
+    const COOLDOWN_DURATION_MS = 5000;
 
     let mediaStream = null;
-    let isAutoMode = true;
     let detectionInterval = null;
     let frameCount = 0;
     let lastFrameTime = Date.now();
     let totalDetections = 0;
-    let lastDetectionTime = 0;
+    let isProcessing = false;
+    let isCooldown = false;
 
-    // Atur ukuran canvas berdasarkan ukuran video
     video.addEventListener('loadedmetadata', () => {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
     });
 
-    // Mode switching
-    autoModeBtn.addEventListener('click', () => {
-        isAutoMode = true;
-        autoModeBtn.classList.add('bg-white', 'shadow-sm');
-        autoModeBtn.classList.remove('text-gray-500');
-        manualModeBtn.classList.remove('bg-white', 'shadow-sm');
-        manualModeBtn.classList.add('text-gray-500');
-
-        if (mediaStream && isAutoMode) {
-            startAutoDetection();
-        }
-    });
-
-    manualModeBtn.addEventListener('click', () => {
-        isAutoMode = false;
-        manualModeBtn.classList.add('bg-white', 'shadow-sm');
-        manualModeBtn.classList.remove('text-gray-500');
-        autoModeBtn.classList.remove('bg-white', 'shadow-sm');
-        autoModeBtn.classList.add('text-gray-500');
-
-        if (detectionInterval) {
-            clearInterval(detectionInterval);
-            detectionInterval = null;
-        }
-        scanningLine.classList.add('hidden');
-    });
-
-    // Aktifkan kamera
     function startCamera() {
         const constraints = {
             video: {
@@ -478,31 +453,24 @@
                 detectBtn.disabled = false;
                 stopBtn.disabled = false;
 
-                // Update UI
                 videoWrapper.querySelector('#cameraOverlay').style.display = 'none';
                 statusIndicator.classList.add('active');
                 recognitionStats.classList.remove('hidden');
+                scanningLine.classList.remove('hidden');
 
-                // Start FPS counter
                 updateFPS();
-
-                // Start auto detection if enabled
-                if (isAutoMode) {
-                    setTimeout(startAutoDetection, 1000);
-                }
             })
             .catch((error) => {
                 console.error("Webcam error:", error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error Kamera',
-                    text: 'Gagal mengakses kamera. Pastikan kamera tidak digunakan aplikasi lain.',
+                    text: 'Gagal mengakses kamera. Pastikan kamera tidak digunakan aplikasi lain dan izin kamera diberikan.',
                     confirmButtonColor: '#8b5cf6'
                 });
             });
     }
 
-    // Matikan kamera
     function stopCamera() {
         if (mediaStream) {
             mediaStream.getTracks().forEach(track => track.stop());
@@ -512,37 +480,20 @@
             detectBtn.disabled = true;
             stopBtn.disabled = true;
 
-            // Update UI
             videoWrapper.querySelector('#cameraOverlay').style.display = 'flex';
             statusIndicator.classList.remove('active');
             recognitionStats.classList.add('hidden');
             scanningLine.classList.add('hidden');
 
-            // Clear intervals
             if (detectionInterval) {
                 clearInterval(detectionInterval);
                 detectionInterval = null;
             }
 
-            // Clear face frames
             clearFaceFrames();
         }
     }
 
-    // Auto detection
-    function startAutoDetection() {
-        if (!isAutoMode || detectionInterval) return;
-
-        scanningLine.classList.remove('hidden');
-
-        detectionInterval = setInterval(() => {
-            if (Date.now() - lastDetectionTime > 3000) { // Throttle detections to 1 per second
-                detectFace();
-            }
-        }, 500); // Check every 100ms but actually detect max 1 per second
-    }
-
-    // Update FPS counter
     function updateFPS() {
         if (!mediaStream) return;
 
@@ -560,13 +511,11 @@
         requestAnimationFrame(updateFPS);
     }
 
-    // Clear face detection frames
     function clearFaceFrames() {
         const frames = videoWrapper.querySelectorAll('.face-frame');
         frames.forEach(frame => frame.remove());
     }
 
-    // Draw face detection frame
     function drawFaceFrame(x, y, width, height, confidence, name = '') {
         clearFaceFrames();
 
@@ -577,17 +526,15 @@
         frame.style.width = `${width}px`;
         frame.style.height = `${height}px`;
 
-        // Confidence badge
         const badge = document.createElement('div');
         badge.className = 'confidence-badge';
         badge.style.top = '-25px';
         badge.style.left = '0';
-        badge.textContent = `${Math.round(confidence * 100)}%${name ? ` - ${name}` : ''}`;
+        badge.textContent = `${name || 'Terdeteksi'} (Jarak: ${Math.round(confidence)})`;
 
         frame.appendChild(badge);
         videoWrapper.appendChild(frame);
 
-        // Remove frame after 2 seconds
         setTimeout(() => {
             if (frame.parentNode) {
                 frame.parentNode.removeChild(frame);
@@ -595,40 +542,83 @@
         }, 2000);
     }
 
-    // Tombol: Mulai kamera
-    startBtn.addEventListener('click', startCamera);
-
-    // Tombol: Stop kamera
-    stopBtn.addEventListener('click', stopCamera);
-
-    // Tombol: Deteksi wajah
-    detectBtn.addEventListener('click', () => {
-        detectFace();
-    });
-
-    // Detect face function
     function detectFace() {
-        if (!mediaStream) return;
+        if (!mediaStream || isProcessing || isCooldown) return;
 
-        lastDetectionTime = Date.now();
+        isProcessing = true;
         totalDetections++;
         detectionCount.textContent = totalDetections;
 
+        context.filter = 'brightness(1.2) contrast(1.1)';
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imageData = canvas.toDataURL('image/jpeg', 0.8); // JPEG dengan kompresi
+        context.filter = 'none';
 
-        // Show processing indicator (toast)
-        const processingToast = Swal.mixin({
+        const imageData = canvas.toDataURL('image/jpeg', 0.8);
+        const rawImageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+        const grayData = new Uint8ClampedArray(canvas.width * canvas.height);
+        let totalBrightness = 0;
+        for (let i = 0, j = 0; i < rawImageData.data.length; i += 4, j++) {
+            const r = rawImageData.data[i];
+            const g = rawImageData.data[i + 1];
+            const b = rawImageData.data[i + 2];
+            const gray = (r + g + b) / 3;
+            grayData[j] = gray;
+            totalBrightness += gray;
+        }
+
+        const avgBrightness = totalBrightness / grayData.length;
+        if (avgBrightness < BRIGHTNESS_THRESHOLD) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Pencahayaan Kurang',
+                text: 'Silakan pastikan ruangan cukup terang untuk deteksi wajah.',
+                timer: 2000,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false
+            }).then(() => { isProcessing = false; });
+            return;
+        }
+
+        const laplacian = (pixels) => {
+            if (pixels.length < 3) return 0;
+            let sum = 0;
+            for (let i = 1; i < pixels.length - 1; i++) {
+                sum += Math.pow(pixels[i - 1] - 2 * pixels[i] + pixels[i + 1], 2);
+            }
+            return sum / pixels.length;
+        };
+        const blurScore = laplacian(grayData);
+
+        if (blurScore < BLUR_THRESHOLD) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Gambar Terlalu Buram',
+                text: 'Pastikan kamera fokus dan wajah tidak bergerak cepat.',
+                timer: 2000,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false
+            }).then(() => { isProcessing = false; });
+            return;
+        }
+
+        const loading = Swal.mixin({
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
             timer: 3000,
             timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
         });
 
-        processingToast.fire({
+        loading.fire({
             icon: 'info',
-            title: 'Mengenali wajah...'
+            title: 'Memproses wajah...'
         });
 
         fetch('/siswa-recognize', {
@@ -642,131 +632,157 @@
                 jadwal_id: jadwalId
             })
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Server error: ${response.status} ${response.statusText}`);
-            }
-            return response.json();
-        })
+        .then(res => res.json())
         .then(data => {
-            processingToast.close();
+            loading.close();
+            isProcessing = false;
 
-            switch(data.status) {
-                case 'success':
-                    // Jika ada lokasi wajah, gambar kotak
-                    if (data.face_location) {
-                        const { x, y, width, height } = data.face_location;
-                        const videoRect = video.getBoundingClientRect();
-                        const scaleX = videoRect.width / canvas.width;
-                        const scaleY = videoRect.height / canvas.height;
+            if (data.data && data.data.face_coords) {
+                const { x, y, w, h } = data.data.face_coords;
+                drawFaceFrame(x, y, w, h, data.confidence, data.data.siswa);
+            } else if (data.confidence !== undefined) {
+                const videoRect = video.getBoundingClientRect();
+                const centerX = videoRect.width / 2 - 50;
+                const centerY = videoRect.height / 2 - 20;
+                drawFaceFrame(centerX, centerY, 100, 40, data.confidence, 'Wajah');
+            }
 
-                        drawFaceFrame(
-                            x * scaleX,
-                            y * scaleY,
-                            width * scaleX,
-                            height * scaleY,
-                            data.confidence || 0.95,
-                            data.nama_siswa || ''
-                        );
+            if (data.status === 'success') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Presensi Tercatat!',
+                    html: `<b>${data.data?.siswa || 'Siswa'}</b> berhasil dicatat.<br>Waktu: ${data.data?.waktu || ''}`,
+                    confirmButtonText: 'Oke', // Tambahkan tombol OK
+                    confirmButtonColor: '#8b5cf6'
+                }).then((result) => {
+                    // Panggil cooldown setelah SweetAlert sukses ditutup
+                    if (result.isConfirmed || result.dismiss === Swal.DismissReason.timer) {
+                        applyCooldown(COOLDOWN_DURATION_MS);
                     }
-
-                    if (data.siswa_nis) {
-                        const namaSiswa = data.nama_siswa || 'Nama Tidak Tersedia';
-                        markAttendance(data.siswa_nis, namaSiswa);
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Data Tidak Lengkap',
-                            text: 'Data siswa tidak lengkap untuk mencatat presensi',
-                            confirmButtonColor: '#ef4444'
-                        });
+                });
+            } else if (data.status === 'already_marked') {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Sudah Presensi',
+                    html: `<b>${data.data?.siswa || 'Siswa'}</b> sudah melakukan presensi untuk jadwal ini.`,
+                    confirmButtonText: 'Oke',
+                    confirmButtonColor: '#8b5cf6'
+                }).then((result) => {
+                    if (result.isConfirmed || result.dismiss === Swal.DismissReason.timer) {
+                        applyCooldown(COOLDOWN_DURATION_MS);
                     }
-                    break;
-
-                case 'face_not_found':
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Wajah Tidak Terdeteksi',
-                        text: 'Pastikan wajah terlihat jelas di kamera',
-                        confirmButtonColor: '#f59e0b',
-                        timer: 2000
-                    });
-                    break;
-
-                case 'not_recognized':
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Wajah Tidak Dikenali',
-                        text: 'Wajah terdeteksi tetapi tidak terdaftar dalam sistem',
-                        confirmButtonColor: '#6b7280',
-                        timer: 3000
-                    });
-                    break;
-
-                case 'already_present':
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Sudah Hadir',
-                        text: `${data.nama_siswa || 'Siswa'} sudah tercatat hadir sebelumnya`,
-                        confirmButtonColor: '#06b6d4',
-                        timer: 2000
-                    });
-                    break;
-
-                case 'not_present':
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Belum Hadir',
-                        text: `${data.nama_siswa || 'Siswa'} belum tercatat hadir`,
-                        confirmButtonColor: '#06b6d4',
-                        timer: 2000
-                    });
-                    break;
-
-                default:
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Kesalahan Tidak Dikenal',
-                        text: data.message || 'Terjadi kesalahan pada server.',
-                        confirmButtonColor: '#ef4444'
-                    });
+                });
+            } else if (data.status === 'low_confidence') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Confidence Rendah',
+                    html: `Wajah ${data.nis ? 'NIS <b>'+data.nis+'</b> ' : ''}terdeteksi tapi tingkat kepercayaan rendah.<br>Jarak: <b>${data.confidence}</b>`,
+                    text: 'Silakan posisikan wajah lebih jelas dan dekat.',
+                    timer: 3500,
+                    showConfirmButton: false,
+                    confirmButtonColor: '#f59e0b'
+                });
+            } else if (data.status === 'face_not_found') {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Wajah Tidak Terdeteksi',
+                    text: data.message || 'Pastikan wajah Anda berada di dalam frame kamera.',
+                    timer: 2000,
+                    showConfirmButton: false,
+                    confirmButtonColor: '#3b82f6'
+                });
+            } else if (data.status === 'unrecognized') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Wajah Tidak Dikenali',
+                    text: data.message || 'Wajah tidak cocok dengan data siswa yang terdaftar.',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    confirmButtonColor: '#ef4444'
+                });
+            } else if (data.status === 'nis_not_found' || data.status === 'no_class_data' || data.status === 'invalid_class') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Data Siswa Bermasalah',
+                    text: data.message || 'Ada masalah dengan data siswa atau jadwal. Silakan hubungi administrator.',
+                    confirmButtonColor: '#ef4444'
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan Sistem',
+                    text: data.message || 'Terjadi kesalahan tidak terduga saat memproses presensi.',
+                    confirmButtonColor: '#ef4444'
+                });
             }
         })
-        .catch(error => {
-            processingToast.close();
-            console.error('Recognition error:', error);
+        .catch(err => {
+            loading.close();
+            console.error('Recognition fetch error:', err);
             Swal.fire({
                 icon: 'error',
-                title: 'Error Koneksi',
-                text: 'Gagal terhubung ke server. Periksa koneksi internet Anda.',
+                title: 'Koneksi Gagal',
+                text: 'Tidak bisa terhubung ke server atau terjadi kesalahan jaringan. Coba periksa koneksi internet Anda.',
                 confirmButtonColor: '#ef4444'
             });
+            isProcessing = false;
         });
     }
 
-    // Pasang sekali event listener sebelum unload
-    window.addEventListener('beforeunload', () => {
-        stopCamera();
-    });
+    function applyCooldown(duration) {
+        isCooldown = true;
+        Swal.fire({
+            icon: 'info',
+            title: 'Cooldown',
+            text: `Deteksi otomatis akan dilanjutkan dalam ${duration / 1000} detik...`,
+            timer: duration,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        }).then(() => {
+            isCooldown = false;
+            if (mediaStream && detectionInterval === null) {
+                detectionInterval = setInterval(() => {
+                    if (!isProcessing && !isCooldown) {
+                        detectFace();
+                    }
+                }, AUTO_DETECTION_INTERVAL_MS);
+            }
+        });
+    }
 
-    // Initialize page
-    document.addEventListener('DOMContentLoaded', function() {
-        // Set initial mode UI
-        if (isAutoMode) {
-            autoModeBtn.classList.add('bg-white', 'shadow-sm');
-            manualModeBtn.classList.add('text-gray-500');
-        } else {
-            manualModeBtn.classList.add('bg-white', 'shadow-sm');
-            autoModeBtn.classList.add('text-gray-500');
+    startBtn.addEventListener('click', startCamera);
+    detectBtn.addEventListener('click', () => {
+        if (mediaStream && !isProcessing && !isCooldown) {
+            detectFace();
+            // Start auto detection interval if not already running, only after first manual trigger
+            if (detectionInterval === null) {
+                detectionInterval = setInterval(() => {
+                    if (!isProcessing && !isCooldown) {
+                        detectFace();
+                    }
+                }, AUTO_DETECTION_INTERVAL_MS);
+            }
         }
+    });
+    stopBtn.addEventListener('click', stopCamera);
 
-        // Cek izin kamera
+    document.addEventListener('DOMContentLoaded', function() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        waktuPresensiInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+
         navigator.permissions.query({ name: 'camera' }).then(function(result) {
             if (result.state === 'denied') {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Izin Kamera Dibutuhkan',
-                    text: 'Aplikasi memerlukan akses kamera untuk pengenalan wajah. Silakan aktifkan izin kamera di pengaturan browser.',
+                    text: 'Aplikasi memerlukan akses kamera untuk pengenalan wajah. Silakan aktifkan izin kamera di pengaturan browser Anda.',
                     confirmButtonColor: '#f59e0b'
                 });
             }
@@ -775,68 +791,37 @@
         });
     });
 
+    document.querySelector('[x-data="{ tab: \'kamera\' }"]').addEventListener('click', (event) => {
+        const clickedButton = event.target.closest('button');
+        if (clickedButton) {
+            const tabText = clickedButton.textContent.trim();
+            const tabName = tabText.includes('Kamera') ? 'kamera' : 'manual';
 
-    // Mark attendance function
-    function markAttendance(siswaNis, namaSiswa = null) {
-    fetch('/mark-attendance', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: JSON.stringify({
-            siswa_nis: siswaNis,
-            nama_siswa: namaSiswa,
-            jadwal_id: jadwalId
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            Swal.fire({
-                icon: 'success',
-                title: 'Presensi Berhasil',
-                text: `${data.data.siswa} - Presensi telah dicatat`,
-                confirmButtonColor: '#10b981',
-                timer: 2000,
-                timerProgressBar: true
-            });
-
-            // Update daftar presensi jika fungsi tersedia
-            if (typeof updateAttendanceList === 'function') {
-                updateAttendanceList(siswaNis, data.data.siswa);
+            if (tabName === 'kamera') {
+                waktuPresensiInput.setAttribute('readonly', 'true');
+                // startCamera(); // Uncomment if you want camera to auto-start on tab switch
+            } else {
+                waktuPresensiInput.removeAttribute('readonly');
+                stopCamera(); // Stop camera when switching to manual tab
             }
-
-        } else if (data.status === 'already_marked') {
-            Swal.fire({
-                icon: 'info',
-                title: 'Sudah Presensi',
-                text: `${data.data.siswa} - Presensi sudah tercatat sebelumnya`,
-                confirmButtonColor: '#06b6d4',
-                timer: 2000
-            });
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Presensi Gagal',
-                text: data.message || 'Terjadi kesalahan saat menyimpan presensi',
-                confirmButtonColor: '#ef4444'
-            });
         }
-    })
-    .catch(error => {
-        console.error("Presensi gagal:", error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error Koneksi',
-            text: 'Terjadi kesalahan saat menyimpan presensi',
-            confirmButtonColor: '#ef4444'
-        });
     });
-}
 
+    // Handle Alpine.js tab initialization
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('tabData', () => ({
+            tab: 'kamera',
+            init() {
+                // Set initial readonly state for waktuPresensiInput based on default tab
+                this.$nextTick(() => {
+                    if (this.tab === 'kamera') {
+                        waktuPresensiInput.setAttribute('readonly', 'true');
+                    } else {
+                        waktuPresensiInput.removeAttribute('readonly');
+                    }
+                });
+            }
+        }));
+    });
 </script>
-
-
 @endsection
-

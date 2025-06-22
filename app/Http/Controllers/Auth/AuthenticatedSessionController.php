@@ -29,6 +29,15 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Tandai user sebagai logged in
+        $user = $request->user();
+        if ($user) {
+            $user->update(['is_logged_in' => true]);
+
+            // Simpan user ID ke session agar bisa dilacak saat session expired
+            $request->session()->put('last_user_id', $user->id);
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
@@ -37,8 +46,8 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $user = Auth::guard('web')->user(); // Ambil user yang sedang login
-        $user = $request->user();
+        $user = $request->user(); // Sama saja dengan Auth::user()
+
         if ($user) {
             $user->update(['is_logged_in' => false]);
         }
@@ -46,7 +55,6 @@ class AuthenticatedSessionController extends Controller
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect('/');

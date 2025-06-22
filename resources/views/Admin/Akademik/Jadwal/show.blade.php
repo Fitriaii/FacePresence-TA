@@ -21,11 +21,11 @@
     <div class="w-full p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-sm drop-shadow">
         {{-- Back Page --}}
         <div class="flex items-center mb-2">
-            <a href="{{ route('jadwal.index') }}" class="inline-flex items-center px-4 py-2 font-sans text-sm font-medium text-white bg-purple-500 rounded-lg hover:bg-purple-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <a href="{{ route('jadwal.index') }}" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 transition-all duration-200 bg-white border border-gray-300 group rounded-xl hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                 </svg>
-                Kembali
+                <span class="text-sm">Kembali</span>
             </a>
         </div>
 

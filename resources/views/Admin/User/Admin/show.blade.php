@@ -61,15 +61,15 @@
                             <span class="inline-flex items-center px-3 py-1 text-xs font-medium text-purple-700 bg-purple-100 rounded-full">
                                 Administrator
                             </span>
-                            @if($admin->last_login_at)
+                            @if($admin->is_logged_in)
                                 <span class="inline-flex items-center px-3 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-full">
                                     <span class="w-2 h-2 mr-1 bg-green-400 rounded-full"></span>
-                                    Active
+                                    Aktif
                                 </span>
                             @else
                                 <span class="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-full">
                                     <span class="w-2 h-2 mr-1 bg-gray-400 rounded-full"></span>
-                                    Inactive
+                                    Tidak Aktif
                                 </span>
                             @endif
                         </div>
@@ -118,10 +118,10 @@
 
                         <!-- Status -->
                         <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700">Status</label>
+                            <label class="text-sm font-medium text-gray-700">Status Login</label>
                             <div class="p-3 border rounded-lg bg-gray-50">
                                 <div class="flex items-center">
-                                    @if($admin->last_login_at)
+                                    @if($admin->is_logged_in)
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                             <span class="w-2 h-2 mr-1 bg-green-400 rounded-full"></span>
                                             Aktif

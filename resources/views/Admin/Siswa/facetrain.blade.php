@@ -70,11 +70,11 @@
                                         <svg class="w-12 h-12 transform -rotate-90" id="countdown-svg">
                                             <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2" fill="none" class="text-gray-200"></circle>
                                             <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2" fill="none"
-                                                    class="text-purple-500 transition-all duration-1000 ease-linear"
-                                                    id="countdown-progress"
-                                                    stroke-dasharray="125.6"
-                                                    stroke-dashoffset="125.6"
-                                                    stroke-linecap="round"></circle>
+                                                            class="text-purple-500 transition-all duration-1000 ease-linear"
+                                                            id="countdown-progress"
+                                                            stroke-dasharray="125.6"
+                                                            stroke-dashoffset="125.6"
+                                                            stroke-linecap="round"></circle>
                                         </svg>
                                         <div class="absolute inset-0 flex items-center justify-center">
                                             <span id="countdown-number" class="text-lg font-bold text-gray-700">3</span>
@@ -101,7 +101,7 @@
                     {{-- Control Buttons --}}
                     <div class="mt-6 space-y-4">
                         <div class="flex flex-col items-center justify-center gap-3 sm:flex-row">
-                            <button id="captureBtn" onclick="startMultiCapture()"
+                            <button id="captureBtn"
                                     class="inline-flex items-center px-8 py-3 font-semibold text-white transition-all duration-200 transform rounded-lg shadow-lg bg-gradient-to-r from-purple-500 to-purple-400 hover:from-purple-600 hover:to-purple-500 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                                     disabled>
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -115,7 +115,7 @@
                                 Batal
                             </a>
                         </div>
-                        <p class="text-sm text-gray-500">5 posisi wajah dalam 15 detik</p>
+                        <p class="text-sm text-gray-500">5 posisi wajah, masing-masing dengan 5 ekspresi</p>
                     </div>
 
                     {{-- Loading State --}}
@@ -253,6 +253,16 @@
         { name: "Bawah", icon: "👇", instruction: "Turunkan kepala sedikit ke bawah" }
     ];
 
+    // Training Expressions Configuration (NEW)
+    const expressions = [
+        { name: "Netral", emoji: "😐", instruction: "dengan wajah santai" },
+        { name: "Senyum", emoji: "😊", instruction: "dengan senyum tipis" },
+        { name: "Mata Terbuka Lebar", emoji: "😮", instruction: "dengan mata terbuka lebar" },
+        { name: "Sedikit Cemberut", emoji: "🙁", instruction: "dengan sedikit cemberut" },
+        { name: "Pipi Mengembang", emoji: " puffed_cheeks", instruction: "mengembungkan pipi" } // Or other easily performed expressions
+    ];
+
+
     // Initialize Camera
     async function initializeCamera() {
         try {
@@ -260,7 +270,7 @@
                 video: {
                     width: { ideal: 640 },
                     height: { ideal: 480 },
-                    facingMode: 'user'
+                    facingMode: 'user' // Use front camera
                 }
             });
 
@@ -303,33 +313,34 @@
     function resetCaptureButton() {
         captureBtn.disabled = false;
         captureBtn.innerHTML = `
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m17 2 4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path>
+                <path d="m7 22-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path>
             </svg>
             Ulangi Capture
         `;
     }
 
-    // Show Instruction Alert
-    function showInstructionAlert(position, index, total) {
+    // Show Instruction Alert (updated for expressions)
+    function showInstructionAlert(position, posIndex, totalPositions, expression, expNumber) {
         if (!instructionAlert) return;
 
-        // Update content
-        if (positionIcon) positionIcon.textContent = position.icon;
-        if (positionTitle) positionTitle.textContent = `Posisi: ${position.name}`;
-        if (positionInstruction) positionInstruction.textContent = position.instruction;
-        if (positionCounter) positionCounter.textContent = `${index + 1}/${total}`;
+        if (positionIcon) positionIcon.textContent = `${position.icon} ${expression.emoji}`;
+        if (positionTitle) positionTitle.textContent = `Posisi: ${position.name} (${expression.name})`;
+        if (positionInstruction) positionInstruction.textContent = `${position.instruction} ${expression.instruction}`;
 
-        // Show alert with smooth animation
+        // Update counter for overall progress (position + expression)
+        const totalExpectedImages = totalPositions * expressions.length;
+        const currentImageIndex = (posIndex * expressions.length) + expNumber;
+        if (positionCounter) positionCounter.textContent = `${currentImageIndex}/${totalExpectedImages}`;
+
         instructionAlert.classList.remove('hidden', 'alert-hidden');
         instructionAlert.classList.add('alert-active');
 
-        // Add glow effect
         if (alertGlow) {
             alertGlow.style.opacity = '1';
         }
 
-        // Reset countdown display
         if (countdownNumber) countdownNumber.textContent = '3';
         if (countdownProgress) countdownProgress.style.strokeDashoffset = '125.6';
     }
@@ -352,15 +363,12 @@
 
         countdownNumber.textContent = number;
 
-        // Add animation class
         countdownNumber.classList.add('countdown-animate');
 
-        // Calculate progress (3 seconds total)
         const progress = (4 - number) / 3;
         const offset = 125.6 - (progress * 125.6);
         countdownProgress.style.strokeDashoffset = offset;
 
-        // Remove animation class after animation completes
         setTimeout(() => {
             countdownNumber.classList.remove('countdown-animate');
         }, 300);
@@ -377,7 +385,7 @@
     function showLoading() {
         if (loading) loading.classList.remove("hidden");
         if (emptyPreview) emptyPreview.style.display = 'none';
-        if (preview) preview.innerHTML = "";
+        if (preview) preview.innerHTML = ""; // Clear previous previews
     }
 
     // Hide Loading State
@@ -385,25 +393,28 @@
         if (loading) loading.classList.add("hidden");
     }
 
-    // Add Image to Preview
-    function addImageToPreview(imageData, position, index) {
+    // Add Image to Preview (updated for expressions)
+    function addImageToPreview(imageData, currentPosition, overallIndex) {
         if (!preview) return;
+
+        // Determine current expression based on overallIndex and expressions.length
+        const currentExpIndex = overallIndex % expressions.length;
+        const currentExpression = expressions[currentExpIndex];
 
         const imgContainer = document.createElement('div');
         imgContainer.className = 'relative group transform transition-all duration-300 hover:scale-105 opacity-0';
         imgContainer.innerHTML = `
-            <img src="${imageData}" class="object-cover w-full h-24 border-2 border-gray-200 rounded-lg shadow-md" alt="${position.name}" />
-            <div class="absolute inset-0 flex items-center justify-center transition-opacity duration-200 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100">
-                <span class="text-xs font-medium text-white">${position.name}</span>
+            <img src="${imageData}" class="object-cover w-full h-24 border-2 border-gray-200 rounded-lg shadow-md" alt="${currentPosition.name} - ${currentExpression.name}" />
+            <div class="absolute inset-0 flex items-center justify-center p-1 text-center transition-opacity duration-200 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100">
+                <span class="text-xs font-medium text-white">${currentPosition.name}<br>${currentExpression.name}</span>
             </div>
             <div class="absolute flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-green-500 rounded-full -top-2 -right-2">
-                ${index + 1}
+                ${overallIndex + 1}
             </div>
         `;
 
         preview.appendChild(imgContainer);
 
-        // Add entrance animation
         setTimeout(() => {
             imgContainer.style.opacity = '1';
             imgContainer.classList.add('animate-pulse');
@@ -416,7 +427,6 @@
         if (!canvas || !ctx || !video) return null;
 
         try {
-            // Set canvas size to match video
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
 
@@ -426,7 +436,6 @@
             ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
             ctx.restore();
 
-            // Get image data
             return canvas.toDataURL('image/png');
         } catch (error) {
             console.error('Error capturing image:', error);
@@ -465,7 +474,8 @@
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorData = await response.json();
+                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
@@ -482,7 +492,8 @@
 
         } catch (error) {
             console.error('Server communication error:', error);
-            throw error;
+            showErrorAlert('Gagal Memproses', error.message || 'Terjadi kesalahan saat proses training');
+            throw error; // Re-throw to be caught by the outer try-catch
         }
     }
 
@@ -523,73 +534,76 @@
         }
     }
 
-    // Main Multi-Capture Function
+    // Main Multi-Capture Function (updated to include expressions)
     async function startMultiCapture() {
-        // Prevent multiple captures
         if (isCapturing) return;
-
         isCapturing = true;
+
         const images = [];
+        const totalPositions = positions.length;
+        const totalExpressions = expressions.length;
+        const totalImagesToCapture = totalPositions * totalExpressions;
 
         try {
-            // Show loading state
             showLoading();
             disableCaptureButton();
 
-            // Mirror video for better UX
-            if (video) video.style.transform = 'scaleX(-1)';
+            // Clear previous previews before starting new capture
+            preview.innerHTML = "";
+            emptyPreview.style.display = 'none';
 
-            // Process each position
-            for (let i = 0; i < positions.length; i++) {
-                const position = positions[i];
-                const progress = ((i + 1) / positions.length) * 100;
+            if (video) video.style.transform = 'scaleX(-1)'; // Mirror effect for user
 
-                // Update progress bar
-                updateProgressBar(progress);
+            for (let posIndex = 0; posIndex < totalPositions; posIndex++) {
+                const position = positions[posIndex];
 
-                // Show instruction alert
-                showInstructionAlert(position, i, positions.length);
+                for (let expIndex = 0; expIndex < totalExpressions; expIndex++) {
+                    const expression = expressions[expIndex];
 
-                // Perform countdown
-                await performCountdown();
+                    showInstructionAlert(position, posIndex, totalPositions, expression, expIndex + 1);
+                    await performCountdown(); // 3..2..1 countdown
 
-                // Hide alert briefly before capture
-                hideInstructionAlert();
-                await new Promise(resolve => setTimeout(resolve, 200));
+                    const overallImageIndex = (posIndex * totalExpressions) + expIndex;
+                    const progress = ((overallImageIndex + 1) / totalImagesToCapture) * 100;
+                    updateProgressBar(progress);
 
-                // Capture image
-                const imageData = captureImage();
-                if (imageData) {
-                    images.push(imageData);
-                    addImageToPreview(imageData, position, i);
-                } else {
-                    throw new Error(`Gagal mengambil gambar untuk posisi ${position.name}`);
-                }
+                    // Delay slightly before capture to ensure user is ready
+                    await new Promise(resolve => setTimeout(resolve, 300));
 
-                // Small delay between captures
-                if (i < positions.length - 1) {
+                    const imageData = captureImage();
+                    if (imageData) {
+                        images.push(imageData);
+                        addImageToPreview(imageData, position, overallImageIndex);
+                    } else {
+                        throw new Error(`Gagal ambil gambar ke-${overallImageIndex + 1} untuk posisi ${position.name} ekspresi ${expression.name}`);
+                    }
+
+                    // Small delay between captures for expression change
                     await new Promise(resolve => setTimeout(resolve, 500));
                 }
+
+                hideInstructionAlert(); // Hide after all expressions for a position are done
+                await new Promise(resolve => setTimeout(resolve, 700)); // Short pause between positions
             }
 
-            // Send images to server
             await sendImagesToServer(images);
 
         } catch (error) {
             console.error('Multi-capture error:', error);
             showErrorAlert('Gagal Memproses', error.message || 'Terjadi kesalahan saat proses training');
         } finally {
-            // Reset UI state
             hideLoading();
             hideInstructionAlert();
             resetCaptureButton();
             updateProgressBar(0);
             isCapturing = false;
-
-            // Reset video transform
-            if (video) video.style.transform = '';
+            if (video) video.style.transform = ''; // Reset mirror effect
+            if (images.length === 0) { // If no images captured, show empty preview message
+                emptyPreview.style.display = 'block';
+            }
         }
     }
+
 
     // Cleanup function
     function cleanup() {

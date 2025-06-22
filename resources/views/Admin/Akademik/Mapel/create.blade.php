@@ -65,7 +65,7 @@
                             value="{{ old('kode_mapel', isset($mapel) ? $mapel->kode_mapel : '') }}"
                             required
                             placeholder="Masukkan Kode Mapel"
-                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
+                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
                         />
                         @error('kode_mapel')
                             <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
@@ -88,7 +88,7 @@
                             required
                             name="nama_mapel"
                             placeholder="Masukkan Nama Mapel"
-                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
+                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
                         />
 
                         @error('nama_mapel')
@@ -109,7 +109,7 @@
                             name="guru"
                             id="guru"
                             required
-                            class="w-full px-4 py-3 mb-4 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
+                            class="w-full px-4 py-3 mb-4 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
                         >
                             <option value="" disabled {{ old('guru', $selectedGuruId ?? '') == '' ? 'selected' : '' }}>Pilih Guru</option>
                             @foreach ($guruList as $guru)

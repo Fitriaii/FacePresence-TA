@@ -53,73 +53,84 @@
                 <!-- Tahun Ajaran -->
                 <div class="grid items-start grid-cols-1 gap-4 lg:grid-cols-3">
                     <div class="lg:text-right">
-                        <label for="nama_siswa" class="block mb-1 text-sm font-semibold text-gray-700 font-heading">
+                        <label class="block mb-1 text-sm font-semibold text-gray-700 font-heading">
                             Tahun Ajaran <span class="text-red-500">*</span>
                         </label>
                     </div>
                     <div class="lg:col-span-2">
-                        <input
-                            type="text"
-                            id="tahun_ajaran"
-                            name="tahun_ajaran"
-                            value="{{ old('tahun_ajaran', $tahunAjaran->tahun_ajaran ?? '') }}"
-                            required
-                            placeholder="Contoh: 2024/2025"
-                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
-                        />
-                        @error('tahun_ajaran')
-                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
+                        <div class="flex items-center gap-2">
+                            <!-- Start Year Input -->
+                            <div class="relative w-1/2">
+                                <input
+                                    type="number"
+                                    id="tahun_mulai"
+                                    name="tahun_mulai"
+                                    min="2000"
+                                    max="2099"
+                                    required
+                                    placeholder="Contoh: 2024"
+                                    value="{{ old('tahun_mulai', explode('/', $ta  ?? '')[0]) }}"
+                                    class="w-full px-4 py-3 pr-8 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+                                />
+                                <div class="absolute inset-y-0 flex flex-col justify-center right-2">
+                                    <button
+                                        type="button"
+                                        onclick="adjustYearStart(1)"
+                                        class="w-5 h-4 text-xs text-purple-600 transition-colors hover:text-purple-800 dark:text-purple-600 dark:hover:text-purple-800"
+                                    >▲</button>
+                                    <button
+                                        type="button"
+                                        onclick="adjustYearStart(-1)"
+                                        class="w-5 h-4 text-xs text-purple-600 transition-colors hover:text-purple-800 dark:text-purple-600 dark:hover:text-purple-800"
+                                    >▼</button>
+                                </div>
+                            </div>
 
-                <!-- Tanggal Mulai -->
-                <div class="grid items-start grid-cols-1 gap-4 lg:grid-cols-3">
-                    <div class="lg:text-right">
-                        <label for="tanggal_mulai" class="block mb-1 text-sm font-semibold text-gray-700 font-heading">
-                            Tanggal Mulai <span class="text-red-500">*</span>
-                        </label>
-                    </div>
-                    <div class="lg:col-span-2">
-                        <div class="relative">
-                            <input
-                                type="date"
-                                id="tanggal_mulai"
-                                name="tanggal_mulai"
-                                value="{{ old('tanggal_mulai', $tahunAjaran->tanggal_mulai ?? '') }}"
-                                required
-                                class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
-                            />
-                            @error('tanggal_mulai')
-                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            <!-- Separator -->
+                            <span class="text-xl font-light text-gray-400 dark:text-gray-600">/</span>
+
+                            <!-- End Year Input -->
+                            <div class="relative w-1/2">
+                                <input
+                                    type="number"
+                                    id="tahun_akhir"
+                                    name="tahun_akhir"
+                                    min="2000"
+                                    max="2099"
+                                    required
+                                    placeholder="Contoh: 2025"
+                                    value="{{ old('tahun_akhir', explode('/', $ta ?? '')[1]) }}"
+                                    class="w-full px-4 py-3 pr-8 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+                                />
+                                <div class="absolute inset-y-0 flex flex-col justify-center right-2">
+                                    <button
+                                        type="button"
+                                        onclick="adjustYearEnd(1)"
+                                        class="w-5 h-4 text-xs text-purple-600 transition-colors hover:text-purple-800 dark:text-purple-600 dark:hover:text-purple-800"
+                                    >▲</button>
+                                    <button
+                                        type="button"
+                                        onclick="adjustYearEnd(-1)"
+                                        class="w-5 h-4 text-xs text-purple-600 transition-colors hover:text-purple-800 dark:text-purple-600 dark:hover:text-purple-800"
+                                    >▼</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Help Text & Errors: Diletakkan setelah .flex -->
+                        <div class="mt-2 space-y-1">
+                            <p class="text-xs text-gray-500 dark:text-gray-600">
+                                Masukkan tahun mulai, tahun akhir akan otomatis terisi.
+                            </p>
+
+                            @error('tahun_mulai')
+                                <p class="text-xs text-red-500 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+
+                            @error('tahun_akhir')
+                                <p class="text-xs text-red-500 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
-
-                    </div>
-                </div>
-
-                <!-- Tanggal Selesai -->
-                <div class="grid items-start grid-cols-1 gap-4 lg:grid-cols-3">
-                    <div class="lg:text-right">
-                        <label for="tanggal_mulai" class="block mb-1 text-sm font-semibold text-gray-700 font-heading">
-                            Tanggal Selesai <span class="text-red-500">*</span>
-                        </label>
-                    </div>
-                    <div class="lg:col-span-2">
-                        <div class="relative">
-                            <input
-                                type="date"
-                                id="tanggal_selesai"
-                                name="tanggal_selesai"
-                                value="{{ old('tanggal_selesai', $tahunAjaran->tanggal_selesai ?? '') }}"
-                                required
-                                class="w-full px-4 py-3 mb-4 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
-                            />
-                        </div>
-
-                        @error('tanggal_selesai')
-                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                        @enderror
                     </div>
                 </div>
             </div>
@@ -145,19 +156,56 @@
 </div>
 
 <script>
-    const inputTanggalMulai = document.getElementById('tanggal_mulai');
-    if (inputTanggalMulai && typeof inputTanggalMulai.showPicker === 'function') {
-        inputTanggalMulai.addEventListener('focus', () => {
-            inputTanggalMulai.showPicker();
-        });
+    const tahunMulaiInput = document.getElementById('tahun_mulai');
+    const tahunAkhirInput = document.getElementById('tahun_akhir');
+
+    function updateTahunAkhir() {
+        const tahunMulai = parseInt(tahunMulaiInput.value);
+        tahunAkhirInput.value = !isNaN(tahunMulai) ? tahunMulai + 1 : '';
     }
-    const inputTanggalSelesai = document.getElementById('tanggal_selesai');
-    if (inputTanggalSelesai && typeof inputTanggalSelesai.showPicker === 'function') {
-        inputTanggalSelesai.addEventListener('focus', () => {
-            inputTanggalSelesai.showPicker();
-        });
+
+    tahunMulaiInput.addEventListener('input', updateTahunAkhir);
+
+    function adjustYearStart(amount) {
+        let current = parseInt(tahunMulaiInput.value || new Date().getFullYear());
+        let nextValue = current + amount;
+
+        if (nextValue >= 2000 && nextValue <= 2099) {
+            tahunMulaiInput.value = nextValue;
+            updateTahunAkhir(); // pastikan akhir ikut berubah
+        }
     }
+
+    function adjustYearEnd(amount) {
+        let current = parseInt(tahunAkhirInput.value || new Date().getFullYear());
+        let nextValue = current + amount;
+
+        if (nextValue >= 2000 && nextValue <= 2099) {
+            tahunAkhirInput.value = nextValue;
+        }
+    }
+
+    // Tampilkan alert sukses/error dari session
+    @if (session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: @json(session('success')),
+            showConfirmButton: false,
+            timer: 2000
+        });
+    @endif
+
+    @if (session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal',
+            text: @json(session('error')),
+            showConfirmButton: true
+        });
+    @endif
 </script>
+
 
 
 @endsection

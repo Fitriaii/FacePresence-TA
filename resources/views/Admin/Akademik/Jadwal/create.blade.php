@@ -62,7 +62,7 @@
                             name="hari"
                             id="hari"
                             required
-                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
+                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
                         >
                             <option value="" disabled {{ old('hari', $jadwal->hari ?? '') == '' ? 'selected' : '' }}>Pilih Hari</option>
                             <option value="Senin" {{ old('hari', $jadwal->hari ?? '') == 'Senin' ? 'selected' : '' }}>Senin</option>
@@ -86,19 +86,34 @@
                         </label>
                     </div>
                     <div class="lg:col-span-2">
-                        <input
-                            type="time"
-                            id="jam_mulai"
-                            name="jam_mulai"
-                            value="{{ old('jam_mulai', $jadwal ?? '') }}"
-                            required
-                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
-                        />
+                        <div class="relative">
+                            <input
+                                type="time"
+                                id="jam_mulai"
+                                name="jam_mulai"
+                                value="{{ old('jam_mulai', $jadwal ?? '') }}"
+                                required
+                                class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
+                            />
+                            <button
+                                type="button"
+                                onclick="document.getElementById('jam_mulai').showPicker()"
+                                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 transition-colors hover:text-purple-600"
+                            >
+                                <!-- Heroicons Jam -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </button>
+                        </div>
                         @error('jam_mulai')
                             <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
+
 
                 <!-- Jam Selesai -->
                 <div class="grid items-start grid-cols-1 gap-4 lg:grid-cols-3">
@@ -108,14 +123,28 @@
                         </label>
                     </div>
                     <div class="lg:col-span-2">
-                        <input
+                        <div class="relative">
+                            <input
                             type="time"
                             id="jam_selesai"
                             name="jam_selesai"
                             value="{{ old('jam_selesai', $jadwal ?? '') }}"
                             required
-                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
+                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
                         />
+                        <button
+                                type="button"
+                                onclick="document.getElementById('jam_selesai').showPicker()"
+                                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 transition-colors hover:text-purple-600"
+                            >
+                                <!-- Heroicons Jam -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </button>
+                        </div>
                         @error('jam_selesai')
                             <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                         @enderror
@@ -134,7 +163,7 @@
                             name="kelas_id"
                             id="kelas"
                             required
-                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
+                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
                         >
                             <option value="" disabled selected>Pilih Kelas</option>
                             @foreach ($kelasList as $kelas)
@@ -160,7 +189,7 @@
                         <select
                             id="mapel"
                             name="mapel_id"
-                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100">
+                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500">
                             <option value="" disabled selected>Pilih Mapel</option>
                             @foreach ($mapelList as $mapel)
                                 <option value="{{ $mapel->id }}" data-guru="{{ $mapel->guru->nama_guru }}">
@@ -185,7 +214,7 @@
                         <input
                         type="text"
                         id="guru_pengampu"
-                        class="w-full px-4 py-3 mb-4 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
+                        class="w-full px-4 py-3 mb-4 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
                         readonly placeholder="Guru Pengampu akan tampil di sini">
                         @error('guru_pengampu')
                             <p class="mt-1 text-xs text-red-500">{{ $message }}</p>

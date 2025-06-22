@@ -112,8 +112,8 @@
                             <div class="flex-shrink-0">
                                 <div class="relative flex items-center justify-center w-16 h-16 overflow-hidden bg-gray-100 border-2 border-gray-300 border-dashed rounded-lg">
                                   <!-- Jika ada preview gambar -->
-                                  @if(isset($admins) && $admins->profile_picture)
-                                    <img src="data:image/jpeg;base64,{{ $admins->profile_picture }}" alt="Preview Foto Profil" class="object-cover w-full h-full rounded-lg" />
+                                  @if(isset($guru) && $guru->user->profile_picture)
+                                    <img src="data:image/jpeg;base64,{{ $guru->user->profile_picture }}" alt="Preview Foto Profil" class="object-cover w-full h-full rounded-lg" />
                                   @else
                                     <!-- Icon Placeholder -->
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -335,5 +335,25 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`;
         }
+
+        // Tampilkan alert sukses/error dari session
+    @if (session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: @json(session('success')),
+            showConfirmButton: false,
+            timer: 2000
+        });
+    @endif
+
+    @if (session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal',
+            text: @json(session('error')),
+            showConfirmButton: true
+        });
+    @endif
     </script>
 @endsection

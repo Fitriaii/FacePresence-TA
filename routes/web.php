@@ -1,5 +1,6 @@
 <?php
 
+use App\Exports\JadwalExport;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GuruController;
@@ -57,12 +58,16 @@ Route::middleware('auth')->group(function () {
         Route::resource('mapel', MapelController::class);
         Route::resource('room',  KelasController::class);
         Route::resource('jadwal',  JadwalController::class);
+        Route::get('/export-jadwal', [JadwalController::class, 'exportJadwal'])->name('exportJadwal');
+
         Route::resource('siswa',  SiswaController::class);
 
         Route::get('/siswa/{id}/capture', [SiswaController::class, 'showCaptureForm'])->name('siswa.capture');
         Route::post('/siswa/{id}/capture-train', [SiswaController::class, 'captureAndTrain'])->name('siswa.capture-train');
 
         Route::resource('laporan', LaporanController::class);
+        Route::post('/laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('laporan.exportPdf');
+
 
         // Route::post('/siswa/capture', [SiswaController::class, 'captureFace'])->name('siswa.capture.run');
         // Route::get('/siswa/{id}/capture', [FaceRecognitionController::class, 'captureForm'])->name('siswa.capture');
@@ -74,15 +79,17 @@ Route::middleware('auth')->group(function () {
         Route::get('/gurudashboard', [GuruDashboardController::class, 'index'])->name('gurudashboard');
 
         Route::resource('presensi',  PresensiController::class);
+        Route::get('/guru/presensi/{jadwalId}/create', [PresensiController::class, 'createPresensi'])->name('presensiJadwal.create');
         Route::post('/presensi/manual/simpan', [PresensiController::class, 'simpanAbsensiManual'])->name('presensi.manual.simpan');
 
         Route::get('/presensi/{id}/capture', [PresensiController::class, 'showCaptureForm'])->name('presensi.capture');
-        Route::post('/siswa-recognize', [PresensiController::class, 'recognizeFace'])->name('siswa.recognize');
-        Route::post('/mark-attendance', [PresensiController::class, 'markAttendance'])->name('mark.attendance');
+        Route::post('/siswa-recognize', [PresensiController::class, 'recognizeAndMark'])->name('siswa.recognize');
+        // Route::post('/mark-attendance', [PresensiController::class, 'markAttendance'])->name('mark.attendance');
 
         Route::resource('daftarSiswa', DaftarSiswaController::class);
         Route::resource('jadwalAjar', JadwalMengajarController::class);
         Route::resource('laporanGuru', LaporanGuruController::class);
+        Route::post('/laporanGuru/export-pdf', [LaporanGuruController::class, 'exportPdf'])->name('laporanguru.exportPdf');
         Route::resource('profileGuru', ProfileGuruController::class);
         // Tambahkan route untuk guru di sini
     });

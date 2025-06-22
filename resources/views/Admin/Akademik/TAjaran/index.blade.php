@@ -37,13 +37,13 @@
                         </button>
                     </form>
 
-                    <!-- Tombol Export -->
+                    {{-- <!-- Tombol Export -->
                     <button class="flex items-center w-full gap-2 px-4 py-2 font-sans text-sm font-semibold text-green-700 transition-all duration-200 border border-green-200 rounded-lg bg-green-50 hover:bg-green-100 hover:border-green-300 sm:w-auto">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
                         Export Excel
-                    </button>
+                    </button> --}}
                 </div>
 
                 <!-- Kanan: Search -->
@@ -61,7 +61,7 @@
                             name="search"
                             placeholder="Cari data..."
                             value="{{ request('search') }}"
-                            class="w-full py-2.5 pl-10 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white placeholder-gray-400 transition-all duration-200"
+                            class="w-full py-2.5 pl-10 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500  bg-white placeholder-gray-400 "
                         >
                     </div>
                 </form>
@@ -75,7 +75,7 @@
                     <div class="space-y-2">
                         <label for="status" class="block text-sm font-semibold text-gray-700">Status</label>
                         <select id="status" name="status"
-                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none transition-colors duration-200">
+                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500">
                             <option value="">Semua Status</option>
                             <option value="Aktif" {{ request('status') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
                             <option value="Tidak Aktif" {{ request('status') == 'Tidak Aktif' ? 'selected' : '' }}>Tidak Aktif</option>
@@ -86,7 +86,7 @@
                     <div class="space-y-2">
                         <label for="tahun_ajaran" class="block text-sm font-semibold text-gray-700">Tahun Mulai</label>
                         <select name="tahun_mulai" id="tahun_mulai"
-                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none transition-colors duration-200">
+                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500">
                             <option value="">Semua Tahun</option>
                             @foreach ($tahunList as $ta)
                                 <option value="{{ $ta }}" {{ request('tahun_mulai') == $ta ? 'selected' : '' }}>
@@ -99,7 +99,7 @@
                     <!-- Sort By -->
                     <div class="space-y-2">
                         <label for="sort" class="block text-sm font-semibold text-gray-700">Urutkan Berdasarkan</label>
-                        <select id="sort" name="sort" class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none transition-colors duration-200">
+                        <select id="sort" name="sort" class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500">
                             <option value="created_desc" {{ request('sort') === 'created_desc' ? 'selected' : '' }}>Terbaru Ditambahkan</option>
                             <option value="created_asc" {{ request('sort') === 'created_asc' ? 'selected' : '' }}>Terlama Ditambahkan</option>
                         </select>
@@ -147,10 +147,10 @@
             <table class="min-w-full bg-white rounded shadow-md">
                 <thead>
                     <tr class="text-sm font-semibold text-gray-700 bg-gray-100 font-heading">
-                        <th class="px-4 py-3 text-left whitespace-nowrap">No</th>
-                        <th class="px-4 py-3 text-left whitespace-nowrap">Tahun Ajaran</th>
-                        <th class="px-4 py-3 text-left whitespace-nowrap">Status</th>
-                        <th class="px-4 py-3 text-left whitespace-nowrap">Aksi</th>
+                        <th class="px-4 py-3 text-left uppercase whitespace-nowrap">No</th>
+                        <th class="px-4 py-3 text-left uppercase whitespace-nowrap">Tahun Ajaran</th>
+                        <th class="px-4 py-3 text-left uppercase whitespace-nowrap">Status</th>
+                        <th class="px-4 py-3 text-left uppercase whitespace-nowrap">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -199,6 +199,7 @@
                                     data-id="{{ $ta->id }}"
                                     data-status="{{ $ta->status }}"
                                     data-ta="{{ $ta->tahun_ajaran }}"
+                                    data-active-count="{{ $activeCount }}"
                                 >
                                     <span class="toggle-icon">
                                         @if($ta->status === 'Aktif')
@@ -215,18 +216,6 @@
                                     <span class="toggle-text">{{ $ta->status === 'Aktif' ? 'Nonaktifkan' : 'Aktifkan' }}</span>
                                 </button>
 
-
-                                {{-- Tombol Detail --}}
-                                <form action="{{ route('tahunajaran.show', $ta) }}" method="GET" class="inline-block">
-                                    @csrf
-                                    <button type="submit" class="text-blue-600 hover:text-blue-800" title="Detail">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                        </svg>
-                                    </button>
-                                </form>
-
                                 {{-- Tombol Edit --}}
                                 <form action="{{ route('tahunajaran.edit', $ta) }}" method="GET" class="inline-block">
                                     @csrf
@@ -240,10 +229,10 @@
                                 </form>
 
                                 {{-- Tombol Hapus --}}
-                                <form action="{{ route('tahunajaran.destroy', $ta) }}" method="POST" class="inline-block" id="deleteForm{{$ta->id}}">
+                                <form action="{{ route('tahunajaran.destroy', $ta) }}" method="POST" class="inline-block" id="deleteForm-{{$ta->id}}">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-800" title="Hapus">
+                                    <button type="button" class="text-red-600 hover:text-red-800" title="Hapus" onclick="confirmDelete({{ $ta->id }})">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
                                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -301,67 +290,89 @@
             const id = this.dataset.id;
             const status = this.dataset.status;
             const tahunAjaran = this.dataset.ta;
+            const activeCount = parseInt(this.dataset.activeCount || "0");
 
             const newStatus = status === 'Aktif' ? 'Nonaktif' : 'Aktif';
             const actionText = status === 'Aktif' ? 'menonaktifkan' : 'mengaktifkan';
             const actionPast = status === 'Aktif' ? 'dinonaktifkan' : 'diaktifkan';
 
-            Swal.fire({
-                title: 'Konfirmasi',
-                text: `Yakin ingin ${actionText} tahun ajaran ${tahunAjaran}?`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: status === 'Aktif' ? '#dc2626' : '#16a34a',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: `Ya, ${actionText}`,
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-
-                    // Show loading
-                    Swal.fire({
-                        title: 'Memproses...',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        showConfirmButton: false,
-                        didOpen: () => Swal.showLoading()
-                    });
-
-                    fetch(`/tahunajaran/${id}/toggle`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken,
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({ _method: 'PATCH' })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire({
-                                title: 'Berhasil!',
-                                text: `Tahun ajaran ${tahunAjaran} berhasil ${actionPast}.`,
-                                icon: 'success'
-                            }).then(() => {
-                                window.location.reload();
-                            });
-                        } else {
-                            throw new Error(data.message || 'Gagal mengubah status');
-                        }
-                    })
-                    .catch(error => {
-                        Swal.fire({
-                            title: 'Gagal!',
-                            text: error.message,
-                            icon: 'error'
-                        });
-                    });
-                }
-            });
+            // Jika sedang ingin mengaktifkan dan sudah ada tahun ajaran aktif lainnya
+            if (status === 'Tidak Aktif' && activeCount >= 1) {
+                Swal.fire({
+                    title: 'Peringatan',
+                    text: 'Hanya satu tahun ajaran yang bisa aktif. Mengaktifkan tahun ajaran ini akan menonaktifkan yang lainnya.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Lanjutkan',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#16a34a',
+                    cancelButtonColor: '#6b7280',
+                }).then((confirmResult) => {
+                    if (confirmResult.isConfirmed) {
+                        showConfirmationAndProceed(id, status, tahunAjaran, actionText, actionPast);
+                    }
+                });
+            } else {
+                showConfirmationAndProceed(id, status, tahunAjaran, actionText, actionPast);
+            }
         });
     });
+
+    function showConfirmationAndProceed(id, status, tahunAjaran, actionText, actionPast) {
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: `Yakin ingin ${actionText} tahun ajaran ${tahunAjaran}?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: status === 'Aktif' ? '#dc2626' : '#16a34a',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: `Ya, ${actionText}`,
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+                Swal.fire({
+                    title: 'Memproses...',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                fetch(`/tahunajaran/${id}/toggle`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ _method: 'PATCH' })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: `Tahun ajaran ${tahunAjaran} berhasil ${actionPast}.`,
+                            icon: 'success'
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        throw new Error(data.message || 'Gagal mengubah status');
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Gagal!',
+                        text: error.message,
+                        icon: 'error'
+                    });
+                });
+            }
+        });
+    }
 
     // Konfirmasi Hapus
     function confirmDelete(id) {
@@ -382,6 +393,28 @@
     }
 </script>
 
+@if (session('status') === 'success' && session('message'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: @json(session('message')),
+            showConfirmButton: false,
+            timer: 2000
+        });
+    </script>
+@endif
+
+@if (session('status') === 'error' && session('message'))
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal',
+            text: @json(session('message')),
+            showConfirmButton: true
+        });
+    </script>
+@endif
 
 
 

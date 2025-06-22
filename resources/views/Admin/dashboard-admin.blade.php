@@ -8,7 +8,7 @@
             <p class="mb-4 font-sans text-gray-600">Selamat datang di dashboard admin PresenSee!</p>
 
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <div class="p-6 text-white transition-all duration-300 shadow-md rounded-xl bg-gradient-to-br from-orange-400 to-amber-400 hover:shadow-xl hover:scale-105">
+                <div class="p-6 text-white transition-all duration-300 shadow-md rounded-xl bg-gradient-to-br from-orange-500 to-red-500 hover:shadow-xl hover:scale-105">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center space-x-4">
                             <div class="p-3 bg-white rounded-lg bg-opacity-20 backdrop-blur-sm">
@@ -39,7 +39,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="p-6 text-white transition-all duration-300 shadow-md rounded-xl bg-gradient-to-br from-violet-400 to-purple-300 hover:shadow-xl hover:scale-105">
+                <div class="p-6 text-white transition-all duration-300 shadow-md rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 hover:shadow-xl hover:scale-105">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center space-x-4">
                             <div class="p-3 bg-white rounded-lg bg-opacity-20 backdrop-blur-sm">
@@ -68,7 +68,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="p-6 text-white transition-all duration-300 shadow-md rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 hover:shadow-xl hover:scale-105">
+                <div class="p-6 text-white transition-all duration-300 shadow-md rounded-xl bg-gradient-to-br from-blue-500 to-teal-500 hover:shadow-xl hover:scale-105">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center space-x-4">
                             <div class="p-3 bg-white rounded-lg bg-opacity-20 backdrop-blur-sm">
@@ -97,7 +97,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="p-6 text-white transition-all duration-300 shadow-md rounded-xl bg-gradient-to-br from-pink-500 to-rose-400 hover:shadow-xl hover:scale-105">
+                <div class="p-6 text-white transition-all duration-300 shadow-md rounded-xl bg-gradient-to-br from-pink-500 to-violet-500 hover:shadow-xl hover:scale-105">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center space-x-4">
                             <div class="p-3 bg-white rounded-lg bg-opacity-20 backdrop-blur-sm">

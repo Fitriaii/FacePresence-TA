@@ -34,7 +34,7 @@
                         </svg>
                     </div>
                     <div>
-                        <h2 class="text-lg font-semibold text-gray-900 font-heading">Filter Laporan</h2>
+                        <h2 class="text-lg font-semibold text-purple-800 font-heading">Filter Laporan</h2>
                         <p class="font-sans text-sm text-gray-600">Pilih kriteria untuk menampilkan laporan</p>
                     </div>
                 </div>
@@ -49,7 +49,7 @@
                             Periode Laporan
                         </label>
                         <select id="periode" name="periode"
-                                class="w-full px-3 py-2 text-sm text-gray-900 transition-colors bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-white dark:text-gray-900 dark:border-gray-300">
+                                class="w-full px-3 py-2 text-sm text-gray-900 transition-colors bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500">
                             <option value="harian" {{ request('periode') == 'harian' ? 'selected' : '' }}>Harian</option>
                             <option value="mingguan" {{ request('periode') == 'mingguan' ? 'selected' : '' }}>Mingguan</option>
                             <option value="bulanan" {{ request('periode') == 'bulanan' ? 'selected' : '' }}>Bulanan</option>
@@ -64,7 +64,7 @@
                             Tahun Ajaran
                         </label>
                         <select id="tahun_ajaran" name="tahun_ajaran_id"
-                                class="w-full px-3 py-2 text-sm text-gray-900 transition-colors bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-white dark:text-gray-900 dark:border-gray-300">
+                                class="w-full px-3 py-2 text-sm text-gray-900 transition-colors bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500">
                             <option value="" {{ !request('tahun_ajaran_id') ? 'selected' : '' }}>
                                 Semua Tahun Ajaran
                             </option>
@@ -82,7 +82,7 @@
                             Kelas
                         </label>
                         <select id="kelas" name="kelas_id"
-                                class="w-full px-3 py-2 text-sm text-gray-900 transition-colors bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-white dark:text-gray-900 dark:border-gray-300">
+                                class="w-full px-3 py-2 text-sm text-gray-900 transition-colors bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500">
                             <option value="" {{ !request('kelas_id') ? 'selected' : '' }}>
                                 Semua Kelas
                             </option>
@@ -100,7 +100,7 @@
                             Mata Pelajaran
                         </label>
                         <select id="mapel" name="mapel_id"
-                                class="w-full px-3 py-2 text-sm text-gray-900 transition-colors bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-white dark:text-gray-900 dark:border-gray-300">
+                                class="w-full px-3 py-2 text-sm text-gray-900 transition-colors bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500">
                             <option value="" {{ !request('mapel_id') ? 'selected' : '' }}>
                                 Semua Mata Pelajaran
                             </option>
@@ -135,7 +135,7 @@
                                 name="search"
                                 value="{{ request('search') }}"
                                 placeholder="Cari nama siswa, NIS, atau keterangan..."
-                                class="w-full py-2 pl-10 pr-4 text-sm border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                class="w-full py-2 pl-10 pr-4 text-sm border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
                             >
                         </div>
                     </div>
@@ -176,96 +176,30 @@
         </div>
     </div>
 
-    <!-- Export Actions -->
     <div class="mt-1 bg-white rounded-sm shadow-sm">
-        <div class="p-6">
-            <div class="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Export Laporan</h3>
-                    <p class="mt-1 text-sm text-gray-600">Download laporan dalam format Excel atau PDF</p>
-                </div>
-
-                <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-3">
-                    <!-- Export Excel -->
-                    <form action="#" method="POST" class="inline-block">
-                        @csrf
-                        <input type="hidden" name="periode" value="{{ request('periode') }}">
-                        <input type="hidden" name="tahun_ajaran_id" value="{{ request('tahun_ajaran_id') }}">
-                        <input type="hidden" name="kelas_id" value="{{ request('kelas_id') }}">
-                        <input type="hidden" name="mapel_id" value="{{ request('mapel_id') }}">
-                        <input type="hidden" name="search" value="{{ request('search') }}">
-                        <input type="hidden" name="status" value="{{ request('status') }}">
-                        <input type="hidden" name="tanggal" value="{{ request('tanggal') }}">
-                        <input type="hidden" name="start_date" value="{{ request('start_date') }}">
-                        <input type="hidden" name="end_date" value="{{ request('end_date') }}">
-                        <input type="hidden" name="bulan" value="{{ request('bulan') }}">
-                        <input type="hidden" name="tahun" value="{{ request('tahun') }}">
-
-                        <button type="submit"
-                                class="w-full px-4 py-2 text-green-700 transition-colors border border-green-200 rounded-lg sm:w-auto bg-green-50 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500">
-                            <span class="flex items-center justify-center text-sm">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
-                                Export Excel
-                            </span>
-                        </button>
-                    </form>
-
-                    <!-- Export PDF -->
-                    <form action="#" method="POST" class="inline-block">
-                        @csrf
-                        <input type="hidden" name="periode" value="{{ request('periode') }}">
-                        <input type="hidden" name="tahun_ajaran_id" value="{{ request('tahun_ajaran_id') }}">
-                        <input type="hidden" name="kelas_id" value="{{ request('kelas_id') }}">
-                        <input type="hidden" name="mapel_id" value="{{ request('mapel_id') }}">
-                        <input type="hidden" name="search" value="{{ request('search') }}">
-                        <input type="hidden" name="status" value="{{ request('status') }}">
-                        <input type="hidden" name="tanggal" value="{{ request('tanggal') }}">
-                        <input type="hidden" name="start_date" value="{{ request('start_date') }}">
-                        <input type="hidden" name="end_date" value="{{ request('end_date') }}">
-                        <input type="hidden" name="bulan" value="{{ request('bulan') }}">
-                        <input type="hidden" name="tahun" value="{{ request('tahun') }}">
-
-                        <button type="submit"
-                                class="w-full px-4 py-2 text-red-700 transition-colors border border-red-200 rounded-lg sm:w-auto bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500">
-                            <span class="flex items-center justify-center text-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                                </svg>
-                                Export PDF
-                            </span>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="mt-1 bg-white rounded-sm shadow-sm">
-        <div class="p-4 bg-white rounded-lg shadow-md">
-            <h3 class="mb-2 text-lg font-semibold text-gray-800">Laporan Detail Kehadiran</h3>
+        <div class="p-4 bg-white rounded-sm shadow-sm">
+            <h3 class="mb-2 text-lg font-semibold text-purple-800">Laporan Detail Kehadiran</h3>
             <p class="text-sm text-gray-600">Berikut adalah detail laporan kehadiran berdasarkan filter yang telah Anda pilih.</p>
             <div class="mt-4 overflow-auto">
                 <table class="min-w-full bg-white rounded shadow-md">
                     <thead>
                         <tr class="text-sm text-gray-700 bg-gray-100">
-                            <th class="p-3 text-left">No</th>
-                            <th class="p-3 text-left">NIS</th>
-                            <th class="p-3 text-left">Nama Siswa</th>
-                            <th class="p-3 text-left">Kelas</th>
-                            <th class="p-3 text-center">Hadir</th>
-                            <th class="p-3 text-center">Izin</th>
-                            <th class="p-3 text-center">Sakit</th>
-                            <th class="p-3 text-center">Alpha</th>
-                            <th class="p-3 text-center">Total</th>
-                            <th class="p-3 text-center">%</th>
+                            <th class="p-3 text-left uppercase">No</th>
+                            <th class="p-3 text-left uppercase">NIS</th>
+                            <th class="p-3 text-left uppercase">Nama Siswa</th>
+                            <th class="p-3 text-left uppercase">Kelas</th>
+                            <th class="p-3 text-center uppercase">Hadir</th>
+                            <th class="p-3 text-center uppercase">Izin</th>
+                            <th class="p-3 text-center uppercase">Sakit</th>
+                            <th class="p-3 text-center uppercase">Alpha</th>
+                            <th class="p-3 text-center uppercase">Total</th>
+                            <th class="p-3 text-center uppercase">%</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($rekapPerSiswa as $index => $siswa)
                             <tr class="text-sm text-gray-700 border-t hover:bg-gray-50">
-                                <td class="p-3">{{ $index + 1 }}</td>
+                                <td class="p-3">{{ $data->firstItem() + $index }}</td>
                                 <td class="p-3">{{ $siswa['nis'] }}</td>
                                 <td class="p-3">{{ $siswa['nama'] }}</td>
                                 <td class="p-3">{{ $siswa['kelas'] }}</td>
@@ -297,7 +231,42 @@
         </div>
     </div>
 
+    <!-- Export Actions -->
+    <div class="mt-1 bg-white rounded-sm shadow-sm">
+        <div class="p-6">
+            <div class="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+                <div>
+                    <h3 class="text-lg font-semibold text-purple-800">Export Laporan Presensi</h3>
+                    <p class="mt-1 text-sm text-gray-600">
+                        Unduh laporan presensi siswa berdasarkan mata pelajaran terpilih.
+                    </p>
+                </div>
 
+                <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-3">
+
+                    <form id="exportPdfForm" action="{{ route('laporan.exportPdf') }}" method="POST" class="inline-block">
+                        @csrf
+
+                        <!-- Hanya mapel_id -->
+                        <input type="hidden" name="mapel_id" value="{{ request('mapel_id') }}">
+
+                        <button type="submit"
+                            class="w-full px-4 py-2 text-red-700 transition-colors border border-red-200 rounded-lg sm:w-auto bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <span class="flex items-center justify-center text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                                </svg>
+                                Export PDF
+                            </span>
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -334,7 +303,7 @@
             const currentYear = new Date().getFullYear();
             const tahunOptions = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
 
-            const inputClass = "w-full text-sm px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors";
+            const inputClass = "w-full text-sm px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500 transition-colors";
             const labelClass = "block text-sm font-medium text-gray-700 mb-2";
 
             const getParam = (param) => new URLSearchParams(window.location.search).get(param);
@@ -343,20 +312,138 @@
                 dynamicFields.innerHTML = `
                     <div class="space-y-2">
                         <label class="${labelClass}">Tanggal</label>
-                        <input type="date" name="tanggal" value="${getParam('tanggal') || ''}" class="${inputClass}" />
+                        <div class="relative">
+                            <input
+                                type="date"
+                                name="tanggal"
+                                id="tanggal"
+                                value="${getParam('tanggal') || ''}"
+                                class="${inputClass}"
+                            />
+                            <button
+                                type="button"
+                                onclick="document.getElementById('tanggal').showPicker()"
+                                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 transition-colors hover:text-purple-600"
+                            >
+                                <!-- Heroicons Calendar -->
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="1.5"
+                                    stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1
+                                        2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18
+                                        0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0
+                                        21 18.75m-18 0v-7.5A2.25 2.25 0 0 1
+                                        5.25 9h13.5A2.25 2.25 0 0 1 21
+                                        11.25v7.5m-9-6h.008v.008H12v-.008ZM12
+                                        15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75
+                                        15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5
+                                        15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0
+                                        2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0
+                                        2.25h.008v.008H16.5V15Z"/>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 `;
+
+                // Tambahkan listener showPicker jika didukung
+                setTimeout(() => {
+                    const inputTanggal = document.getElementById('tanggal');
+                    if (inputTanggal && typeof inputTanggal.showPicker === 'function') {
+                        inputTanggal.addEventListener('focus', () => {
+                            inputTanggal.showPicker();
+                        });
+                    }
+                }, 10); // Tunggu elemen dirender terlebih dahulu
+
             } else if (periode === 'mingguan' || periode === 'custom') {
                 dynamicFields.innerHTML = `
                     <div class="space-y-2">
                         <label class="${labelClass}">Dari Tanggal</label>
-                        <input type="date" name="start_date" value="${getParam('start_date') || ''}" class="${inputClass}" />
+                        <div class="relative">
+                            <input
+                                type="date"
+                                id="start_date"
+                                name="start_date"
+                                value="${getParam('start_date') || ''}"
+                                class="${inputClass}"
+                            />
+                            <button
+                                type="button"
+                                onclick="document.getElementById('start_date').showPicker()"
+                                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 transition-colors hover:text-purple-600"
+                            >
+                                <!-- Heroicons Calendar -->
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="1.5"
+                                    stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1
+                                        2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18
+                                        0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0
+                                        21 18.75m-18 0v-7.5A2.25 2.25 0 0 1
+                                        5.25 9h13.5A2.25 2.25 0 0 1 21
+                                        11.25v7.5m-9-6h.008v.008H12v-.008ZM12
+                                        15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75
+                                        15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5
+                                        15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0
+                                        2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0
+                                        2.25h.008v.008H16.5V15Z"/>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
+
                     <div class="space-y-2">
                         <label class="${labelClass}">Sampai Tanggal</label>
-                        <input type="date" name="end_date" value="${getParam('end_date') || ''}" class="${inputClass}" />
+                        <div class="relative">
+                            <input
+                                type="date"
+                                id="end_date"
+                                name="end_date"
+                                value="${getParam('end_date') || ''}"
+                                class="${inputClass}"
+                            />
+                            <button
+                                type="button"
+                                onclick="document.getElementById('end_date').showPicker()"
+                                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 transition-colors hover:text-purple-600"
+                            >
+                                <!-- Heroicons Calendar -->
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="1.5"
+                                    stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1
+                                        2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18
+                                        0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0
+                                        21 18.75m-18 0v-7.5A2.25 2.25 0 0 1
+                                        5.25 9h13.5A2.25 2.25 0 0 1 21
+                                        11.25v7.5m-9-6h.008v.008H12v-.008ZM12
+                                        15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75
+                                        15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5
+                                        15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0
+                                        2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0
+                                        2.25h.008v.008H16.5V15Z"/>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 `;
+
+                // Tambahkan showPicker() saat input difokuskan
+                setTimeout(() => {
+                    const inputStart = document.getElementById('start_date');
+                    const inputEnd = document.getElementById('end_date');
+
+                    if (inputStart && typeof inputStart.showPicker === 'function') {
+                        inputStart.addEventListener('focus', () => inputStart.showPicker());
+                    }
+                    if (inputEnd && typeof inputEnd.showPicker === 'function') {
+                        inputEnd.addEventListener('focus', () => inputEnd.showPicker());
+                    }
+                }, 10);
             } else if (periode === 'bulanan') {
                 const selectedBulan = getParam('bulan') || String(new Date().getMonth() + 1).padStart(2, '0');
                 const selectedTahun = getParam('tahun') || currentYear;
@@ -409,14 +496,49 @@
         // Export confirmation
         document.querySelectorAll('form[action*="export"]').forEach(exportForm => {
             exportForm.addEventListener('submit', function (e) {
+                e.preventDefault(); // Cegah submit dulu
+
                 const format = this.action.includes('excel') ? 'Excel' : 'PDF';
-                if (!confirm(`Apakah Anda yakin ingin mengexport laporan ke format ${format}?`)) {
-                    e.preventDefault();
-                }
+
+                Swal.fire({
+                    title: `Export ke ${format}?`,
+                    text: `Apakah Anda yakin ingin mengexport laporan ke format ${format}?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, export',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        exportForm.submit(); // Submit form jika dikonfirmasi
+                    }
+                });
             });
         });
+
     });
 </script>
+@if (session('status') === 'success' && session('message'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: @json(session('message')),
+            showConfirmButton: false,
+            timer: 2000
+        });
+    </script>
+@endif
+
+@if (session('status') === 'error' && session('message'))
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal',
+            text: @json(session('message')),
+            showConfirmButton: true
+        });
+    </script>
+@endif
 
 
 @endsection

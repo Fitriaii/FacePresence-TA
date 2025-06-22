@@ -195,54 +195,52 @@ class AdminController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, User $admin)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users,email,' . $admin->id,
-        'password' => 'nullable|string|min:8',
-        'profile_picture' => 'nullable|image|max:2048', // max 2MB
-    ], [
-        'name.required' => 'Nama wajib diisi.',
-        'email.required' => 'Email wajib diisi.',
-        'email.email' => 'Format email tidak valid.',
-        'email.unique' => 'Email sudah digunakan.',
-        'password.min' => 'Kata sandi minimal 8 karakter.',
-        'profile_picture.image' => 'File harus berupa gambar.',
-        'profile_picture.max' => 'Ukuran gambar maksimal 2MB.',
-    ]);
-
-    try {
-        $admin->name = $request->name;
-        $admin->email = $request->email;
-
-        if ($request->filled('password')) {
-            $admin->password = Hash::make($request->password);
-        }
-
-        if ($request->hasFile('profile_picture') && $request->file('profile_picture')->isValid()) {
-            $file = $request->file('profile_picture');
-            $imageData = file_get_contents($file->getRealPath());
-            $admin->profile_picture = base64_encode($imageData);
-        }
-
-        $admin->save();
-
-        return redirect()->route('admin.index')->with([
-            'status' => 'success',
-            'code' => 200,
-            'message' => 'Profil admin berhasil diperbarui.',
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $admin->id,
+            'password' => 'nullable|string|min:8',
+            'profile_picture' => 'nullable|image|max:2048', // max 2MB
+        ], [
+            'name.required' => 'Nama wajib diisi.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan.',
+            'password.min' => 'Kata sandi minimal 8 karakter.',
+            'profile_picture.image' => 'File harus berupa gambar.',
+            'profile_picture.max' => 'Ukuran gambar maksimal 2MB.',
         ]);
-    } catch (\Exception $e) {
-        Log::error('Gagal memperbarui profil admin: ' . $e->getMessage());
 
-        return redirect()->back()->withInput()->with([
-            'status' => 'error',
-            'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
-        ]);
+        try {
+            $admin->name = $request->name;
+            $admin->email = $request->email;
+
+            if ($request->filled('password')) {
+                $admin->password = Hash::make($request->password);
+            }
+
+            if ($request->hasFile('profile_picture') && $request->file('profile_picture')->isValid()) {
+                $file = $request->file('profile_picture');
+                $imageData = file_get_contents($file->getRealPath());
+                $admin->profile_picture = base64_encode($imageData);
+            }
+
+            $admin->save();
+
+            return redirect()->route('admin.index')->with([
+                'status' => 'success',
+                'code' => 200,
+                'message' => 'Profil admin berhasil diperbarui.',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Gagal memperbarui profil admin: ' . $e->getMessage());
+
+            return redirect()->back()->withInput()->with([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ]);
+        }
     }
-}
-
-
 
     /**
      * Remove the specified resource from storage.

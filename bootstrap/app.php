@@ -14,6 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             \RealRashid\SweetAlert\ToSweetAlert::class,
+            'web' => [
+                // middleware bawaan...
+                \App\Http\Middleware\TrackSessionExpiration::class,
+            ],
         ]);
 
         $middleware->alias([
@@ -21,6 +25,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
+
+
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

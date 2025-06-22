@@ -39,12 +39,16 @@
                     </form>
 
                     <!-- Tombol Export -->
-                    <button class="flex items-center w-full gap-2 px-4 py-2 font-sans text-sm font-semibold text-green-700 transition-all duration-200 border border-green-200 rounded-lg bg-green-50 hover:bg-green-100 hover:border-green-300 sm:w-auto">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                        Export Excel
-                    </button>
+                    {{-- <form action="{{ route('exportJadwal') }}">
+                        @csrf
+                        <button type="submit" class="flex items-center w-full gap-2 px-4 py-2 font-sans text-sm font-semibold text-green-700 transition-all duration-200 border border-green-200 rounded-lg bg-green-50 hover:bg-green-100 hover:border-green-300 sm:w-auto">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            Export Jadwal
+                        </button>
+                    </form> --}}
+
                 </div>
 
                 <!-- Kanan: Search -->
@@ -62,7 +66,7 @@
                             name="search"
                             placeholder="Cari data..."
                             value="{{ request('search') }}"
-                            class="w-full py-2.5 pl-10 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white placeholder-gray-400 transition-all duration-200"
+                            class="w-full py-2.5 pl-10 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500 bg-white placeholder-gray-400 transition-all duration-200"
                         >
                     </div>
                 </form>
@@ -77,7 +81,7 @@
                     <div class="space-y-2">
                         <label for="hari" class="block text-sm font-semibold text-gray-700">Hari</label>
                         <select name="hari" id="hari"
-                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none transition-colors duration-200">
+                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500">
                             <option value="">Semua Hari</option>
                             <option value="Senin" {{ request('hari') == 'Senin' ? 'selected' : '' }}>Senin</option>
                             <option value="Selasa" {{ request('hari') == 'Selasa' ? 'selected' : '' }}>Selasa</option>
@@ -92,7 +96,7 @@
                     <div class="space-y-2">
                         <label for="kelas" class="block text-sm font-semibold text-gray-700">Kelas</label>
                         <select name="kelas" id="kelas"
-                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none transition-colors duration-200">
+                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500">
                             <option value="">Semua Kelas</option>
                             @foreach ($semuaKelas as $kelas)
                                 <option value="{{ $kelas->id }}" {{ request('kelas') == $kelas->id ? 'selected' : '' }}>
@@ -106,7 +110,7 @@
                     <div class="space-y-2">
                         <label for="mapel" class="block text-sm font-semibold text-gray-700">Mata Pelajaran</label>
                         <select name="mapel" id="mapel"
-                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none transition-colors duration-200">
+                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500">
                             <option value="">Semua Mapel</option>
                             @foreach ($semuaMapel as $mapel)
                                 <option value="{{ $mapel->id }}" {{ request('mapel') == $mapel->id ? 'selected' : '' }}>
@@ -119,7 +123,7 @@
                     <!-- Sort By -->
                     <div class="space-y-2">
                         <label for="sort" class="block text-sm font-semibold text-gray-700">Urutkan Berdasarkan</label>
-                        <select id="sort" name="sort" class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none transition-colors duration-200">
+                        <select id="sort" name="sort" class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500">
                             <option value="created_desc" {{ request('sort') === 'created_desc' ? 'selected' : '' }}>Terbaru Ditambahkan</option>
                             <option value="created_asc" {{ request('sort') === 'created_asc' ? 'selected' : '' }}>Terlama Ditambahkan</option>
                             <option value="jam_mulai_asc" {{ request('sort') == 'jam_mulai_asc' ? 'selected' : '' }}>Jam Mulai (Awal ke Akhir)</option>
@@ -169,20 +173,21 @@
             <table class="min-w-full bg-white rounded shadow-md">
                 <thead>
                     <tr class="text-sm font-semibold text-gray-700 bg-gray-100 font-heading">
-                        <th class="px-4 py-3 text-left whitespace-nowrap">No</th>
-                        <th class="px-4 py-3 text-left whitespace-nowrap">Hari</th>
-                        <th class="px-4 py-3 text-left whitespace-nowrap">Kelas</th>
-                        <th class="px-4 py-3 text-left whitespace-nowrap">Jam Mulai</th>
-                        <th class="px-4 py-3 text-left whitespace-nowrap">Mapel</th>
-                        <th class="px-4 py-3 text-left whitespace-nowrap">Guru Pengampu</th>
-                        <th class="px-4 py-3 text-left whitespace-nowrap">Aksi</th>
+                        <th class="px-4 py-3 text-left uppercase whitespace-nowrap">No</th>
+                        <th class="px-4 py-3 text-left uppercase whitespace-nowrap">Hari</th>
+                        <th class="px-4 py-3 text-left uppercase whitespace-nowrap">Kelas</th>
+                        <th class="px-4 py-3 text-left uppercase whitespace-nowrap">Jam Mulai</th>
+                        <th class="px-4 py-3 text-left uppercase whitespace-nowrap">Mapel</th>
+                        <th class="px-4 py-3 text-left uppercase whitespace-nowrap">Guru Pengampu</th>
+                        <th class="px-4 py-3 text-left uppercase whitespace-nowrap">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
+                    @php $no = 1; @endphp
                     @forelse ($groupedKelas as $hari => $kelasGroup)
                         @php $rowspanHari = $kelasGroup->flatten()->count(); @endphp
                         @php $firstHariPrinted = false; @endphp
-                        @php $no = 1; @endphp
+
 
                         @foreach ($kelasGroup as $kelasId => $j )
 
@@ -297,4 +302,26 @@
         });
     }
 </script>
+@if (session('status') === 'success' && session('message'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: @json(session('message')),
+            showConfirmButton: false,
+            timer: 2000
+        });
+    </script>
+@endif
+
+@if (session('status') === 'error' && session('message'))
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal',
+            text: @json(session('message')),
+            showConfirmButton: true
+        });
+    </script>
+@endif
 @endsection

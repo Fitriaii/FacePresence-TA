@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\JadwalExport;
 use App\Http\Controllers\Controller;
 use App\Models\Guru;
 use App\Models\Jadwal;
 use App\Models\Kelas;
 use App\Models\Mapel;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class JadwalController extends Controller
 {
@@ -235,6 +237,11 @@ class JadwalController extends Controller
             'code' => 200,
             'message' => 'Jadwal berhasil dihapus.'
         ]);
+    }
+
+    public function exportJadwal()
+    {
+        return Excel::download(new JadwalExport, 'jadwal_' . date('Ymd') . '.xlsx');
     }
 
 }

@@ -40,7 +40,7 @@
                             name="search"
                             value="{{ request('search') }}"
                             placeholder="Cari siswa..."
-                            class="w-full py-2 pl-10 pr-4 text-sm border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                            class="w-full py-2 pl-10 pr-4 text-sm border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
                         >
                     </div>
                 </form>
@@ -54,7 +54,7 @@
                     <div class="space-y-2">
                         <label for="tahun_ajaran" class="block text-sm font-semibold text-gray-700">Tahun Ajaran</label>
                         <select id="tahun_ajaran" name="tahun_ajaran"
-                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none transition-colors duration-200">
+                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 focus:outline-none transition-colors duration-200 dark:bg-white dark:text-gray-900 dark:border-gray-300">
                             <option value="">Semua Tahun Ajaran</option>
                             @foreach ($semuaTahunAjaran as $ta)
                                 <option value="{{ $ta->id }}" {{ request('tahun_ajaran') == $ta->id ? 'selected' : '' }}>
@@ -68,7 +68,7 @@
                     <div class="space-y-2">
                         <label for="jenis_kelas" class="block text-sm font-semibold text-gray-700">Jenis Kelas</label>
                         <select id="jenis_kelas" name="jenis_kelas"
-                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none transition-colors duration-200">
+                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 focus:outline-none transition-colors duration-200 dark:bg-white dark:text-gray-900 dark:border-gray-300">
                             <option value="">Semua Jenis Kelas</option>
                             <option value="Reguler" {{ request('jenis_kelas') == 'Reguler' ? 'selected' : '' }}>Reguler</option>
                             <option value="Tahfidz" {{ request('jenis_kelas') == 'Tahfidz' ? 'selected' : '' }}>Tahfidz</option>
@@ -79,7 +79,7 @@
                     <div class="space-y-2">
                         <label for="kelas" class="block text-sm font-semibold text-gray-700">Kelas</label>
                         <select id="kelas" name="kelas"
-                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none transition-colors duration-200">
+                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 focus:outline-none transition-colors duration-200 dark:bg-white dark:text-gray-900 dark:border-gray-300">
                             <option value="">Semua Kelas</option>
                             @foreach ($semuaKelas as $kls)
                                 <option value="{{ $kls->id }}" {{ request('kelas') == $kls->id ? 'selected' : '' }}>
@@ -93,7 +93,7 @@
                     <!-- Sort By -->
                     <div class="space-y-2">
                         <label for="sort" class="block text-sm font-semibold text-gray-700">Urutkan Berdasarkan</label>
-                        <select id="sort" name="sort" class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none transition-colors duration-200">
+                        <select id="sort" name="sort" class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 focus:outline-none transition-colors duration-200 dark:bg-white dark:text-gray-900 dark:border-gray-300">
                             <option value="nama_siswa_asc" {{ request('sort') === 'nama_siswa_asc' ? 'selected' : '' }}>Nama (A-Z)</option>
                             <option value="nama_siswa_desc" {{ request('sort') === 'nama_siswa_desc' ? 'selected' : '' }}>Nama (Z-A)</option>
                             <option value="created_desc" {{ request('sort') === 'created_desc' ? 'selected' : '' }}>Terbaru Ditambahkan</option>

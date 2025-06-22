@@ -22,6 +22,7 @@
         <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <script type="module" src="https://unpkg.com/cally"></script>
 
@@ -60,7 +61,7 @@
             @endif
 
             <!-- Main content area -->
-            <div class="flex flex-col flex-1 min-w-0">
+            <div class="flex flex-col flex-1 min-w-0 min-h-screen">
                 <!-- Navigation bar - Fixed di atas -->
                 <div class="flex-shrink-0 bg-white border-b border-gray-200">
                     @if (Auth::user()->hasRole('admin'))
@@ -76,6 +77,14 @@
                         @yield('content')
                     </div>
                 </main>
+
+                <!-- Footer - Tetap di bawah -->
+                <div class="w-full py-4 mt-auto text-center bg-white border-t border-gray-200">
+                    <p class="text-xs text-gray-500">
+                        © {{ date('Y') }} <span class="font-semibold text-purple-600">PresenSee</span>. Sistem Presensi Digital.
+                    </p>
+                </div>
+
             </div>
         </div>
     </body>

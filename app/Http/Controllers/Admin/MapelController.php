@@ -25,7 +25,7 @@ class MapelController extends Controller
         }
 
     // Query dasar
-    $mapelQuery = Mapel::query();
+    $mapelQuery = Mapel::with('guru');
 
     // Search by kode_mapel atau nama_mapel
     if ($request->filled('search')) {

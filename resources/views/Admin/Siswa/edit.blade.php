@@ -42,7 +42,7 @@
                             value="{{ old('nama_siswa', isset($siswa) ? $siswa->nama_siswa : '') }}"
                             required
                             placeholder="Masukkan Nama Lengkap"
-                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
+                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
                         />
                         @error('nama_siswa')
                             <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
@@ -65,7 +65,7 @@
                             value="{{ old('nis', isset($siswa) ? $siswa->nis : '') }}"
                             required
                             placeholder="Masukkan NIS"
-                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
+                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
                         />
                         @error('nis')
                             <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
@@ -85,7 +85,7 @@
                             name="jenis_kelamin"
                             id="jenis_kelamin"
                             required
-                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
+                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
                         >
                             <option value="" disabled {{ old('jenis_kelamin', $siswa->jenis_kelamin ?? '') == '' ? 'selected' : '' }}>Pilih Jenis Kelamin</option>
                             <option value="Laki-Laki" {{ old('jenis_kelamin', $siswa->jenis_kelamin ?? '') == 'Laki-Laki' ? 'selected' : '' }}>Laki-Laki</option>
@@ -113,11 +113,12 @@
                             name="kelas_id"
                             id="kelas_id"
                             required
-                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 focus:border-purple-600 focus:ring-2 focus:ring-purple-100"
+                            class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
                         >
-                            <option value="" disabled>Pilih Kelas</option>
+                        <option value="" disabled {{ old('kelas_id', isset($siswaKelas) ? $siswaKelas->kelas_id : '') == '' ? 'selected' : '' }}>Pilih Kelas</option>
                             @foreach ($kelasList as $kelas)
-                                <option value="{{ $kelas->id }}" {{ old('kelas_id') == $kelas->id ? 'selected' : ''}}>
+                                <option value="{{ $kelas->id }}"
+                                    {{ old('kelas_id', isset($siswaKelas) ? $siswaKelas->kelas_id : '') == $kelas->id ? 'selected' : '' }}>
                                     {{ $kelas->nama_kelas }}
                                 </option>
                             @endforeach
@@ -143,7 +144,7 @@
                             type="text"
                             value="{{ $activeTahunAjaran->tahun_ajaran }}"
                             readonly
-                            class="w-full px-4 py-3 text-sm transition-colors duration-200 bg-gray-100 border border-gray-300 rounded-lg outline-none cursor-not-allowed"
+                            class="w-full px-4 py-3 text-sm transition-colors duration-200 bg-gray-100 border border-gray-300 rounded-lg outline-none cursor-not-allowed dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
                         >
                         <p class="mt-2 text-xs text-gray-500">Hanya menampilkan tahun ajaran yang aktif</p>
                     </div>
@@ -185,4 +186,32 @@
 
     });
 </script> --}}
+
+{{-- @if (session('success'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: @json(session('success')),
+                showConfirmButton: false,
+                timer: 2000
+            });
+        });
+    </script>
+@endif
+
+@if (session('error'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: @json(session('error')),
+                showConfirmButton: true
+            });
+        });
+    </script>
+@endif --}}
+
 @endsection

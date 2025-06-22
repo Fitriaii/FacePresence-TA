@@ -243,7 +243,7 @@
                         <!-- Footer -->
                         <div class="mt-8 text-center">
                             <p class="text-xs text-gray-400">
-                                © 2024 PresenSee. Sistem Presensi Digital.
+                                © {{ date('Y') }} PresenSee. Sistem Presensi Digital.
                             </p>
                         </div>
                     </div>

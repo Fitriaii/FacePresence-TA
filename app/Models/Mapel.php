@@ -17,6 +17,6 @@ class Mapel extends Model
 
     public function guru()
     {
-        return $this->belongsTo(User::class, 'guru_id', 'id')->withDefault();
+        return $this->belongsTo(Guru::class, 'guru_id', 'id')->withDefault();
     }
 }

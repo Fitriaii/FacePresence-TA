@@ -38,13 +38,13 @@
                         </button>
                     </form>
 
-                    <!-- Tombol Export -->
+                    {{-- <!-- Tombol Export -->
                     <button class="flex items-center w-full gap-2 px-4 py-2 font-sans text-sm font-semibold text-green-700 transition-all duration-200 border border-green-200 rounded-lg bg-green-50 hover:bg-green-100 hover:border-green-300 sm:w-auto">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
                         Export Excel
-                    </button>
+                    </button> --}}
                 </div>
 
                 <!-- Kanan: Search -->
@@ -62,7 +62,7 @@
                             name="search"
                             placeholder="Cari data..."
                             value="{{ request('search') }}"
-                            class="w-full py-2.5 pl-10 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white placeholder-gray-400 transition-all duration-200"
+                            class="w-full py-2.5 pl-10 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500 bg-white placeholder-gray-400 transition-all duration-200"
                         >
                     </div>
                 </form>
@@ -76,7 +76,7 @@
                     <div class="space-y-2">
                         <label for="tahun_ajaran" class="block text-sm font-semibold text-gray-700">Tahun Ajaran</label>
                         <select id="tahun_ajaran" name="tahun_ajaran"
-                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none transition-colors duration-200">
+                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500 focus:outline-none transition-colors duration-200">
                             <option value="">Semua Tahun Ajaran</option>
                             @foreach ($semuaTahunAjaran as $ta)
                                 <option value="{{ $ta->id }}" {{ request('tahun_ajaran') == $ta->id ? 'selected' : '' }}>
@@ -90,7 +90,7 @@
                     <div class="space-y-2">
                         <label for="jenis_kelas" class="block text-sm font-semibold text-gray-700">Jenis Kelas</label>
                         <select id="jenis_kelas" name="jenis_kelas"
-                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none transition-colors duration-200">
+                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500 focus:outline-none transition-colors duration-200">
                             <option value="">Semua Jenis Kelas</option>
                             <option value="Reguler" {{ request('jenis_kelas') == 'Reguler' ? 'selected' : '' }}>Reguler</option>
                             <option value="Tahfidz" {{ request('jenis_kelas') == 'Tahfidz' ? 'selected' : '' }}>Tahfidz</option>
@@ -101,7 +101,7 @@
                     <div class="space-y-2">
                         <label for="kelas" class="block text-sm font-semibold text-gray-700">Kelas</label>
                         <select id="kelas" name="kelas"
-                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none transition-colors duration-200">
+                            class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500 focus:outline-none transition-colors duration-200">
                             <option value="">Semua Kelas</option>
                             @foreach ($semuaKelas as $kls)
                                 <option value="{{ $kls->id }}" {{ request('kelas') == $kls->id ? 'selected' : '' }}>
@@ -115,7 +115,7 @@
                     <!-- Sort By -->
                     <div class="space-y-2">
                         <label for="sort" class="block text-sm font-semibold text-gray-700">Urutkan Berdasarkan</label>
-                        <select id="sort" name="sort" class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none transition-colors duration-200">
+                        <select id="sort" name="sort" class="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500 focus:outline-none transition-colors duration-200">
                             <option value="nama_siswa_asc" {{ request('sort') === 'nama_siswa_asc' ? 'selected' : '' }}>Nama (A-Z)</option>
                             <option value="nama_siswa_desc" {{ request('sort') === 'nama_siswa_desc' ? 'selected' : '' }}>Nama (Z-A)</option>
                             <option value="created_desc" {{ request('sort') === 'created_desc' ? 'selected' : '' }}>Terbaru Ditambahkan</option>
@@ -165,13 +165,13 @@
                 <table class="min-w-full bg-white rounded shadow-md">
                     <thead>
                         <tr class="text-sm font-semibold text-gray-700 bg-gray-100 font-heading">
-                            <th class="px-4 py-3 text-left whitespace-nowrap">No</th>
-                            <th class="px-4 py-3 text-left whitespace-nowrap">NIS</th>
-                            <th class="px-4 py-3 text-left whitespace-nowrap">Nama</th>
-                            <th class="px-4 py-3 text-left whitespace-nowrap">Jenis Kelamin</th>
-                            <th class="px-4 py-3 text-left whitespace-nowrap">Kelas</th>
-                            <th class="px-4 py-3 text-left whitespace-nowrap">Tahun Ajaran</th>
-                            <th class="px-4 py-3 text-left whitespace-nowrap">Aksi</th>
+                            <th class="px-4 py-3 text-left uppercase whitespace-nowrap">No</th>
+                            <th class="px-4 py-3 text-left uppercase whitespace-nowrap">NIS</th>
+                            <th class="px-4 py-3 text-left uppercase whitespace-nowrap">Nama</th>
+                            <th class="px-4 py-3 text-left uppercase whitespace-nowrap">Jenis Kelamin</th>
+                            <th class="px-4 py-3 text-left uppercase whitespace-nowrap">Kelas</th>
+                            <th class="px-4 py-3 text-left uppercase whitespace-nowrap">Tahun Ajaran</th>
+                            <th class="px-4 py-3 text-left uppercase whitespace-nowrap">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -227,10 +227,10 @@
                                     </form>
 
                                     {{-- Tombol Hapus --}}
-                                    <form action="{{ route('siswa.destroy', $s) }}" method="POST" class="inline-block" id="deleteForm{{$s->id}}">
+                                    <form action="{{ route('siswa.destroy', $s) }}" method="POST" class="inline-block" id="deleteForm-{{$s->id}}">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-800" title="Hapus">
+                                        <button type="button" onclick="confirmDelete({{ $s->id }})" class="text-red-600 hover:text-red-800" title="Hapus">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
                                                 viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -262,7 +262,7 @@
     let typingTimer;
     const delay = 400;
 
-    if (searchInput) {
+    if (searchInput && searchForm) {
         searchInput.addEventListener('keyup', () => {
             clearTimeout(typingTimer);
             typingTimer = setTimeout(() => {
@@ -275,21 +275,18 @@
         });
     }
 
-    // Filter change submit
+    // Auto-submit filter form saat filter berubah
     const filterForm = document.getElementById('filterForm');
     ['tahun_ajaran', 'jenis_kelas', 'kelas', 'sort'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) {
+        if (el && filterForm) {
             el.addEventListener('change', () => {
                 filterForm.submit();
             });
         }
     });
-    // Auto-submit filter form saat sort berubah
-    document.getElementById('sort')?.addEventListener('change', () => {
-        document.getElementById('filterForm').submit();
-    });
 
+    // Konfirmasi hapus siswa
     function confirmDelete(id) {
         Swal.fire({
             title: 'Apakah Anda yakin?',
@@ -302,9 +299,32 @@
             cancelButtonColor: '#3085d6',
         }).then((result) => {
             if (result.isConfirmed) {
-                document.getElementById('deleteForm-' + id).submit();  // Mengirim form jika konfirmasi dihapus
+                document.getElementById('deleteForm-' + id).submit();
             }
         });
     }
+    // Tampilkan alert sukses/error dari session
 </script>
+@if (session('status') === 'success' && session('message'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: @json(session('message')),
+            showConfirmButton: false,
+            timer: 2000
+        });
+    </script>
+@endif
+
+@if (session('status') === 'error' && session('message'))
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal',
+            text: @json(session('message')),
+            showConfirmButton: true
+        });
+    </script>
+@endif
 @endsection
