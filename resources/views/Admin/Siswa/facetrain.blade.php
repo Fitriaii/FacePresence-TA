@@ -35,7 +35,7 @@
 
                 <div class="p-4 text-center">
                     {{-- Modern Instruction Alert Area --}}
-                    <div id="instruction-alert" class="hidden w-full max-w-md mx-auto mt-4 mb-4 transition-all duration-500 transform scale-95 opacity-0">
+                    <div id="instruction-alert" class="hidden w-full max-w-md mx-auto mt-4 mb-4 transition-all duration-500 transform scale-95 opacity-0 sm:max-w-lg">
                         <div class="relative p-4 border border-gray-200 shadow-sm bg-gradient-to-r from-slate-50 to-gray-50 rounded-2xl backdrop-blur-sm">
                             {{-- Animated Border --}}
                             <div class="absolute inset-0 transition-opacity duration-300 opacity-0 rounded-2xl bg-gradient-to-r from-purple-500/20 to-blue-500/20" id="alert-glow"></div>
@@ -51,15 +51,15 @@
                                     </div>
                                     <div class="flex-1 min-w-0 text-left">
                                         <div class="flex items-center space-x-2">
-                                            <h4 id="position-title" class="text-sm font-semibold text-gray-900 truncate">
+                                            <h4 id="position-title" class="text-sm font-semibold leading-snug text-gray-900 break-words">
                                                 Posisi: Depan
                                             </h4>
                                             <div class="flex-shrink-0 px-2 py-0.5 text-xs font-medium text-purple-700 bg-purple-100 rounded-full">
                                                 <span id="position-counter">1/5</span>
                                             </div>
                                         </div>
-                                        <p id="position-instruction" class="text-xs text-gray-600 mt-0.5 truncate">
-                                            Lihat lurus ke kamera
+                                        <p id="position-instruction" class="text-xs text-gray-600 mt-0.5 break-words leading-snug">
+                                            Lihat lurus ke kamera dengan wajah tegak
                                         </p>
                                     </div>
                                 </div>
@@ -70,11 +70,11 @@
                                         <svg class="w-12 h-12 transform -rotate-90" id="countdown-svg">
                                             <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2" fill="none" class="text-gray-200"></circle>
                                             <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2" fill="none"
-                                                            class="text-purple-500 transition-all duration-1000 ease-linear"
-                                                            id="countdown-progress"
-                                                            stroke-dasharray="125.6"
-                                                            stroke-dashoffset="125.6"
-                                                            stroke-linecap="round"></circle>
+                                                    class="text-purple-500 transition-all duration-1000 ease-linear"
+                                                    id="countdown-progress"
+                                                    stroke-dasharray="125.6"
+                                                    stroke-dashoffset="125.6"
+                                                    stroke-linecap="round"></circle>
                                         </svg>
                                         <div class="absolute inset-0 flex items-center justify-center">
                                             <span id="countdown-number" class="text-lg font-bold text-gray-700">3</span>
@@ -85,6 +85,7 @@
                         </div>
                     </div>
 
+                    {{-- Video Preview --}}
                     <div class="relative inline-block">
                         <video id="video" width="640" height="480" autoplay muted playsinline
                                class="bg-gray-900 border-4 border-gray-100 rounded-lg shadow-lg"></video>
@@ -92,10 +93,6 @@
 
                         {{-- Camera Overlay --}}
                         <div class="absolute inset-0 border-2 border-purple-300 border-dashed rounded-lg opacity-50 pointer-events-none"></div>
-                        <div class="absolute flex items-center px-2 py-1 text-xs font-medium text-white bg-red-500 rounded-full top-4 left-4">
-                            <div class="w-2 h-2 mr-1 bg-white rounded-full animate-pulse"></div>
-                            LIVE
-                        </div>
                     </div>
 
                     {{-- Control Buttons --}}
@@ -115,7 +112,7 @@
                                 Batal
                             </a>
                         </div>
-                        <p class="text-sm text-gray-500">5 posisi wajah, masing-masing dengan 5 ekspresi</p>
+                        <p class="text-sm text-gray-500">Capture 5 posisi wajah untuk pelatihan sistem presensi</p>
                     </div>
 
                     {{-- Loading State --}}
@@ -230,7 +227,6 @@
     const emptyPreview = document.getElementById('emptyPreview');
     const progressBar = document.getElementById('progressBar');
 
-    // Instruction Alert Elements
     const instructionAlert = document.getElementById('instruction-alert');
     const positionIcon = document.getElementById('position-icon');
     const positionTitle = document.getElementById('position-title');
@@ -240,11 +236,9 @@
     const countdownProgress = document.getElementById('countdown-progress');
     const alertGlow = document.getElementById('alert-glow');
 
-    // Global Variables
     let isCapturing = false;
     let currentStream = null;
 
-    // Training Positions Configuration
     const positions = [
         { name: "Depan", icon: "👤", instruction: "Lihat lurus ke kamera dengan wajah tegak" },
         { name: "Kiri", icon: "👈", instruction: "Putar kepala ke kiri 30 derajat" },
@@ -253,42 +247,27 @@
         { name: "Bawah", icon: "👇", instruction: "Turunkan kepala sedikit ke bawah" }
     ];
 
-    // Training Expressions Configuration (NEW)
-    const expressions = [
-        { name: "Netral", emoji: "😐", instruction: "dengan wajah santai" },
-        { name: "Senyum", emoji: "😊", instruction: "dengan senyum tipis" },
-        { name: "Mata Terbuka Lebar", emoji: "😮", instruction: "dengan mata terbuka lebar" },
-        { name: "Sedikit Cemberut", emoji: "🙁", instruction: "dengan sedikit cemberut" },
-        { name: "Pipi Mengembang", emoji: " puffed_cheeks", instruction: "mengembungkan pipi" } // Or other easily performed expressions
-    ];
-
-
-    // Initialize Camera
     async function initializeCamera() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: {
                     width: { ideal: 640 },
                     height: { ideal: 480 },
-                    facingMode: 'user' // Use front camera
+                    facingMode: 'user'
                 }
             });
-
             currentStream = stream;
             video.srcObject = stream;
-
             video.onloadedmetadata = () => {
                 video.play();
                 enableCaptureButton();
             };
-
         } catch (err) {
-            console.error('Camera initialization error:', err);
-            showErrorAlert('Gagal Akses Kamera', `Tidak dapat mengakses webcam: ${err.message}`);
+            console.error('Camera error:', err);
+            showErrorAlert('Gagal Akses Kamera', err.message);
         }
     }
 
-    // Enable Capture Button
     function enableCaptureButton() {
         captureBtn.disabled = false;
         captureBtn.innerHTML = `
@@ -300,7 +279,6 @@
         `;
     }
 
-    // Disable Capture Button
     function disableCaptureButton() {
         captureBtn.disabled = true;
         captureBtn.innerHTML = `
@@ -309,7 +287,6 @@
         `;
     }
 
-    // Reset Capture Button
     function resetCaptureButton() {
         captureBtn.disabled = false;
         captureBtn.innerHTML = `
@@ -321,100 +298,63 @@
         `;
     }
 
-    // Show Instruction Alert (updated for expressions)
-    function showInstructionAlert(position, posIndex, totalPositions, expression, expNumber) {
+    function showInstructionAlert(position, index, total) {
         if (!instructionAlert) return;
-
-        if (positionIcon) positionIcon.textContent = `${position.icon} ${expression.emoji}`;
-        if (positionTitle) positionTitle.textContent = `Posisi: ${position.name} (${expression.name})`;
-        if (positionInstruction) positionInstruction.textContent = `${position.instruction} ${expression.instruction}`;
-
-        // Update counter for overall progress (position + expression)
-        const totalExpectedImages = totalPositions * expressions.length;
-        const currentImageIndex = (posIndex * expressions.length) + expNumber;
-        if (positionCounter) positionCounter.textContent = `${currentImageIndex}/${totalExpectedImages}`;
-
+        positionIcon.textContent = position.icon;
+        positionTitle.textContent = `Posisi: ${position.name}`;
+        positionInstruction.textContent = position.instruction;
+        positionCounter.textContent = `${index + 1}/${total}`;
         instructionAlert.classList.remove('hidden', 'alert-hidden');
         instructionAlert.classList.add('alert-active');
-
-        if (alertGlow) {
-            alertGlow.style.opacity = '1';
-        }
-
-        if (countdownNumber) countdownNumber.textContent = '3';
-        if (countdownProgress) countdownProgress.style.strokeDashoffset = '125.6';
+        alertGlow.style.opacity = '1';
+        countdownNumber.textContent = '3';
+        countdownProgress.style.strokeDashoffset = '125.6';
     }
 
-    // Hide Instruction Alert
     function hideInstructionAlert() {
-        if (!instructionAlert) return;
-
         instructionAlert.classList.remove('alert-active');
         instructionAlert.classList.add('alert-hidden');
-
-        if (alertGlow) {
-            alertGlow.style.opacity = '0';
-        }
+        alertGlow.style.opacity = '0';
     }
 
-    // Update Countdown Display
     function updateCountdown(number) {
-        if (!countdownNumber || !countdownProgress) return;
-
         countdownNumber.textContent = number;
-
         countdownNumber.classList.add('countdown-animate');
-
         const progress = (4 - number) / 3;
         const offset = 125.6 - (progress * 125.6);
         countdownProgress.style.strokeDashoffset = offset;
-
         setTimeout(() => {
             countdownNumber.classList.remove('countdown-animate');
         }, 300);
     }
 
-    // Update Progress Bar
     function updateProgressBar(progress) {
-        if (progressBar) {
-            progressBar.style.width = progress + '%';
-        }
+        progressBar.style.width = progress + '%';
     }
 
-    // Show Loading State
     function showLoading() {
-        if (loading) loading.classList.remove("hidden");
-        if (emptyPreview) emptyPreview.style.display = 'none';
-        if (preview) preview.innerHTML = ""; // Clear previous previews
+        loading.classList.remove("hidden");
+        emptyPreview.style.display = 'none';
+        preview.innerHTML = "";
     }
 
-    // Hide Loading State
     function hideLoading() {
-        if (loading) loading.classList.add("hidden");
+        loading.classList.add("hidden");
     }
 
-    // Add Image to Preview (updated for expressions)
-    function addImageToPreview(imageData, currentPosition, overallIndex) {
-        if (!preview) return;
-
-        // Determine current expression based on overallIndex and expressions.length
-        const currentExpIndex = overallIndex % expressions.length;
-        const currentExpression = expressions[currentExpIndex];
-
+    function addImageToPreview(imageData, position, index) {
         const imgContainer = document.createElement('div');
         imgContainer.className = 'relative group transform transition-all duration-300 hover:scale-105 opacity-0';
         imgContainer.innerHTML = `
-            <img src="${imageData}" class="object-cover w-full h-24 border-2 border-gray-200 rounded-lg shadow-md" alt="${currentPosition.name} - ${currentExpression.name}" />
+            <img src="${imageData}" class="object-cover w-full h-24 border-2 border-gray-200 rounded-lg shadow-md" alt="${position.name}" />
             <div class="absolute inset-0 flex items-center justify-center p-1 text-center transition-opacity duration-200 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100">
-                <span class="text-xs font-medium text-white">${currentPosition.name}<br>${currentExpression.name}</span>
+                <span class="text-xs font-medium text-white">${position.name}</span>
             </div>
             <div class="absolute flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-green-500 rounded-full -top-2 -right-2">
-                ${overallIndex + 1}
+                ${index + 1}
             </div>
         `;
-
         preview.appendChild(imgContainer);
-
         setTimeout(() => {
             imgContainer.style.opacity = '1';
             imgContainer.classList.add('animate-pulse');
@@ -422,190 +362,129 @@
         }, 100);
     }
 
-    // Capture Single Image
     function captureImage() {
-        if (!canvas || !ctx || !video) return null;
-
-        try {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-
-            // Draw video frame to canvas (flip horizontally for mirror effect)
-            ctx.save();
-            ctx.scale(-1, 1);
-            ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
-            ctx.restore();
-
-            return canvas.toDataURL('image/png');
-        } catch (error) {
-            console.error('Error capturing image:', error);
-            return null;
-        }
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.save();
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+        ctx.restore();
+        return canvas.toDataURL('image/png');
     }
 
-    // Perform Countdown
     async function performCountdown() {
         let countdown = 3;
         updateCountdown(countdown);
-
         return new Promise((resolve) => {
-            const countdownInterval = setInterval(() => {
+            const interval = setInterval(() => {
                 countdown--;
                 if (countdown > 0) {
                     updateCountdown(countdown);
                 } else {
-                    clearInterval(countdownInterval);
+                    clearInterval(interval);
                     resolve();
                 }
             }, 1000);
         });
     }
 
-    // Send Images to Server
     async function sendImagesToServer(images) {
-        try {
-            const response = await fetch("{{ route('siswa.capture-train', $siswa->id) }}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                },
-                body: JSON.stringify({ images })
-            });
+        const response = await fetch("{{ route('siswa.capture-train', $siswa->id) }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({ images })
+        });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            if (data.status === 'success') {
-                showSuccessAlert('Berhasil! 🎉', data.message, () => {
-                    if (data.redirect) {
-                        window.location.href = data.redirect;
-                    }
-                });
-            } else {
-                throw new Error(data.message || 'Terjadi kesalahan saat proses training.');
-            }
-
-        } catch (error) {
-            console.error('Server communication error:', error);
-            showErrorAlert('Gagal Memproses', error.message || 'Terjadi kesalahan saat proses training');
-            throw error; // Re-throw to be caught by the outer try-catch
-        }
-    }
-
-    // Show Success Alert
-    function showSuccessAlert(title, message, callback) {
-        if (typeof Swal !== 'undefined') {
-            Swal.fire({
-                icon: 'success',
-                title: title,
-                text: message,
-                confirmButtonColor: '#6B46C1',
-                customClass: {
-                    popup: 'rounded-xl',
-                    confirmButton: 'rounded-lg'
-                }
-            }).then(callback);
-        } else {
-            alert(`${title}: ${message}`);
-            if (callback) callback();
-        }
-    }
-
-    // Show Error Alert
-    function showErrorAlert(title, message) {
-        if (typeof Swal !== 'undefined') {
-            Swal.fire({
-                icon: 'error',
-                title: title,
-                text: message,
-                confirmButtonColor: '#e53e3e',
-                customClass: {
-                    popup: 'rounded-xl',
-                    confirmButton: 'rounded-lg'
-                }
+        const data = await response.json();
+        if (response.ok && data.status === 'success') {
+            showSuccessAlert('Berhasil! 🎉', data.message, () => {
+                if (data.redirect) window.location.href = data.redirect;
             });
         } else {
-            alert(`${title}: ${message}`);
+            throw new Error(data.message || 'Gagal proses training.');
         }
     }
 
-    // Main Multi-Capture Function (updated to include expressions)
     async function startMultiCapture() {
         if (isCapturing) return;
         isCapturing = true;
 
         const images = [];
         const totalPositions = positions.length;
-        const totalExpressions = expressions.length;
-        const totalImagesToCapture = totalPositions * totalExpressions;
+        const capturesPerPosition = 5; // Ambil 5 data per posisi
+        const totalImages = totalPositions * capturesPerPosition;
 
         try {
             showLoading();
             disableCaptureButton();
+            if (video) video.style.transform = 'scaleX(-1)';
 
-            // Clear previous previews before starting new capture
-            preview.innerHTML = "";
-            emptyPreview.style.display = 'none';
+            for (let i = 0; i < totalPositions; i++) {
+                const pos = positions[i];
 
-            if (video) video.style.transform = 'scaleX(-1)'; // Mirror effect for user
+                showInstructionAlert(pos, i, totalPositions);
+                await performCountdown();
 
-            for (let posIndex = 0; posIndex < totalPositions; posIndex++) {
-                const position = positions[posIndex];
-
-                for (let expIndex = 0; expIndex < totalExpressions; expIndex++) {
-                    const expression = expressions[expIndex];
-
-                    showInstructionAlert(position, posIndex, totalPositions, expression, expIndex + 1);
-                    await performCountdown(); // 3..2..1 countdown
-
-                    const overallImageIndex = (posIndex * totalExpressions) + expIndex;
-                    const progress = ((overallImageIndex + 1) / totalImagesToCapture) * 100;
-                    updateProgressBar(progress);
-
-                    // Delay slightly before capture to ensure user is ready
+                for (let j = 0; j < capturesPerPosition; j++) {
                     await new Promise(resolve => setTimeout(resolve, 300));
 
-                    const imageData = captureImage();
-                    if (imageData) {
-                        images.push(imageData);
-                        addImageToPreview(imageData, position, overallImageIndex);
+                    const image = captureImage();
+                    const globalIndex = i * capturesPerPosition + j;
+
+                    if (image) {
+                        images.push(image);
+                        addImageToPreview(image, pos, globalIndex);
+                        updateProgressBar(((globalIndex + 1) / totalImages) * 100);
                     } else {
-                        throw new Error(`Gagal ambil gambar ke-${overallImageIndex + 1} untuk posisi ${position.name} ekspresi ${expression.name}`);
+                        throw new Error(`Gagal capture ${j + 1} dari posisi ${pos.name}`);
                     }
 
-                    // Small delay between captures for expression change
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                    // Delay antar capture agar wajah tidak kaku
+                    await new Promise(resolve => setTimeout(resolve, 400));
                 }
 
-                hideInstructionAlert(); // Hide after all expressions for a position are done
-                await new Promise(resolve => setTimeout(resolve, 700)); // Short pause between positions
+                hideInstructionAlert();
+                await new Promise(resolve => setTimeout(resolve, 500));
             }
 
             await sendImagesToServer(images);
 
-        } catch (error) {
-            console.error('Multi-capture error:', error);
-            showErrorAlert('Gagal Memproses', error.message || 'Terjadi kesalahan saat proses training');
+        } catch (err) {
+            console.error(err);
+            showErrorAlert('Gagal', err.message);
         } finally {
             hideLoading();
             hideInstructionAlert();
             resetCaptureButton();
             updateProgressBar(0);
             isCapturing = false;
-            if (video) video.style.transform = ''; // Reset mirror effect
-            if (images.length === 0) { // If no images captured, show empty preview message
-                emptyPreview.style.display = 'block';
-            }
+            video.style.transform = '';
+            if (images.length === 0) emptyPreview.style.display = 'block';
         }
     }
 
 
-    // Cleanup function
+    function showSuccessAlert(title, message, callback) {
+        Swal.fire({
+            icon: 'success',
+            title, text: message,
+            confirmButtonColor: '#6B46C1',
+            customClass: { popup: 'rounded-xl', confirmButton: 'rounded-lg' }
+        }).then(callback);
+    }
+
+    function showErrorAlert(title, message) {
+        Swal.fire({
+            icon: 'error',
+            title, text: message,
+            confirmButtonColor: '#e53e3e',
+            customClass: { popup: 'rounded-xl', confirmButton: 'rounded-lg' }
+        });
+    }
+
     function cleanup() {
         if (currentStream) {
             currentStream.getTracks().forEach(track => track.stop());
@@ -613,27 +492,15 @@
         }
     }
 
-    // Event Listeners
-    if (captureBtn) {
-        captureBtn.addEventListener('click', startMultiCapture);
-    }
-
-    // Cleanup on page unload
+    if (captureBtn) captureBtn.addEventListener('click', startMultiCapture);
     window.addEventListener('beforeunload', cleanup);
 
-    // Initialize when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeCamera);
-    } else {
-        initializeCamera();
-    }
+    document.readyState === 'loading'
+        ? document.addEventListener('DOMContentLoaded', initializeCamera)
+        : initializeCamera();
 
-    // Export functions for external use (if needed)
-    window.cameraTraining = {
-        startMultiCapture,
-        initializeCamera,
-        cleanup
-    };
+    window.cameraTraining = { startMultiCapture, initializeCamera, cleanup };
 </script>
+
 
 @endsection

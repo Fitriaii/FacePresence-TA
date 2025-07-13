@@ -109,6 +109,7 @@ class AdminController extends Controller
             'name.required' => 'Nama wajib diisi.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan.',
             'password.required' => 'Kata sandi wajib diisi.',
             'password.min' => 'Kata sandi minimal 8 karakter.',
             'profile_picture.image' => 'File harus berupa gambar.',
@@ -247,19 +248,30 @@ class AdminController extends Controller
      */
     public function destroy(Request $request, User $admin)
     {
-        if (!$admin->hasRole('admin')) {
-            return redirect()->back()->with('error', 'Unauthorized. Hanya admin yang dapat dihapus.');
+        try {
+            // Cek apakah user memiliki role admin
+            if (!$admin->hasRole('admin')) {
+                return redirect()->back()->with([
+                    'status' => 'error',
+                    'message' => 'Unauthorized. Hanya admin yang dapat dihapus.'
+                ]);
+            }
+
+            // Hapus user
+            $admin->delete();
+
+            return redirect()->route('admin.index')->with([
+                'status' => 'success',
+                'message' => 'Admin berhasil dihapus.'
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->with([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat menghapus admin: ' . $e->getMessage()
+            ]);
         }
-
-        // Jika ada relasi user lain yang perlu dihapus, lakukan di sini
-        // if ($admins->user) {
-        //     $admins->user->delete();
-        // }
-
-        $admin->delete();
-
-        return redirect()->route('admin.index')->with('success', 'Admin berhasil dihapus.');
     }
+
 
 
 }

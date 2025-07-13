@@ -180,7 +180,7 @@
                                 $kelasTerbaru = $s->siswa_kelas->sortByDesc('created_at')->first();
                             @endphp
                         <tr class="text-sm text-gray-700 border-t hover:bg-gray-50">
-                            <td class="px-4 py-3 text-left whitespace-nowrap">{{ $loop->iteration }}</td>
+                            <td class="px-4 py-3 text-left whitespace-nowrap">{{ $loop->iteration + ($siswa->currentPage() - 1) * $siswa->perPage() }}</td>
                             <td class="px-4 py-3 text-left whitespace-nowrap">{{ $s->nis }}</td>
                             <td class="px-4 py-3 text-left whitespace-nowrap">{{ $s->nama_siswa }}</td>
                             <td class="px-4 py-3 text-left whitespace-nowrap">{{ $s->jenis_kelamin }}</td>

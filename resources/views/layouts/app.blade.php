@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html x-data="data()" lang="en">
+<html x-data="data()" lang="en" class="dark">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -26,6 +26,8 @@
 
         <script type="module" src="https://unpkg.com/cally"></script>
 
+        {{-- <script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script> --}}
+
     </head>
     <body class="h-screen overflow-hidden">
         @include('sweetalert::alert')
@@ -44,7 +46,7 @@
                 x-show="isSideMenuOpen"
                 x-cloak
                 @click="closeSideMenu"
-                class="fixed inset-0 z-50 bg-black bg-opacity-50 md:hidden"
+                class="fixed inset-0 z-10 bg-black bg-opacity-50 md:hidden"
                 x-transition:enter="transition ease-in-out duration-150"
                 x-transition:enter-start="opacity-0"
                 x-transition:enter-end="opacity-100"

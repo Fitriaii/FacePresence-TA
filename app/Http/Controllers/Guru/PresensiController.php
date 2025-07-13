@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 
 class PresensiController extends Controller
@@ -25,8 +26,6 @@ class PresensiController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-
-        // Ambil data guru dari user
         $guru = $user->guru;
 
         if (!$guru) {
@@ -84,6 +83,7 @@ class PresensiController extends Controller
             $presensi = Presensi::with(['siswa_kelas.siswa', 'jadwal'])
                 ->whereIn('jadwal_id', $jadwal->pluck('id'))
                 ->whereIn('siswa_kelas_id', $siswaKelas->pluck('id'))
+                ->orderBy('created_at', 'desc')
                 ->paginate(10)
                 ->appends($request->query());
         }
@@ -144,10 +144,20 @@ class PresensiController extends Controller
                 return $item;
             });
 
+        $now = now();
+        $jamMulai = Carbon::createFromFormat('H:i:s', $jadwal->jam_mulai);
+        $jamSelesai = Carbon::createFromFormat('H:i:s', $jadwal->jam_selesai);
+        // Cek apakah saat ini berada di luar rentang jam pelajaran
+        $showWarning = !($now->between($jamMulai, $jamSelesai));
+
+        $totalSiswa = Siswa_Kelas::where('kelas_id', $jadwal->kelas_id)->count();
+
         return view('guru.presensi.create', [
             'jadwal' => $jadwal,
             'siswa' => $siswa,
             'presensi' => $presensi,
+            'showWarning' => $showWarning,
+            'totalSiswa' => $totalSiswa,
         ]);
     }
 
@@ -293,7 +303,7 @@ class PresensiController extends Controller
             $presensi->delete();
             return redirect()->route('presensi.index')->with([
                 'status' => 'success',
-                'message' => 'Siswa berhasil dihapus.'
+                'message' => 'Presensi berhasil dihapus.'
             ]);
         } catch (\Exception $e) {
             return redirect()->route('presensi.index')->with([
@@ -490,340 +500,252 @@ class PresensiController extends Controller
     //     ]);
     // }
 
-
     // public function recognizeAndMark(Request $request)
     // {
     //     $pythonApiUrl = 'http://127.0.0.1:5000/recognize';
-    //     $confidenceThreshold = 70;
 
+    //     /* ── 1. VALIDASI INPUT ───────────────────────────────────────────── */
     //     $request->validate([
     //         'jadwal_id' => 'required|exists:jadwal,id',
-    //         'image' => 'nullable|string',
-    //         'image_url' => 'nullable|url',
-    //         'image_file' => 'nullable|file|image',
+    //         'image'     => 'required|string',
     //     ]);
 
     //     try {
-    //         // Ambil gambar
-    //         if ($request->has('image_url')) {
-    //             $imageData = @file_get_contents($request->input('image_url'));
-    //             if (!$imageData) {
-    //                 return response()->json([
-    //                     'status' => 'error',
-    //                     'message' => 'Gagal mengambil gambar dari URL.',
-    //                 ], 422);
-    //             }
-    //             $base64 = base64_encode($imageData);
-    //         } elseif ($request->hasFile('image_file')) {
-    //             $file = $request->file('image_file');
-    //             $imageData = file_get_contents($file->getRealPath());
-    //             $base64 = base64_encode($imageData);
-    //         } elseif ($request->filled('image')) {
-    //             $base64 = preg_replace('/^data:image\/\w+;base64,/', '', $request->input('image'));
-    //         } else {
-    //             return response()->json([
-    //                 'status' => 'error',
-    //                 'message' => 'Gambar tidak ditemukan. Kirim image, image_file, atau image_url.',
-    //             ], 422);
-    //         }
+    //         /* ── 2. KONVERSI GAMBAR ──────────────────────────────────────── */
+    //         $base64 = preg_replace('#^data:image/\w+;base64,#', '', $request->image);
 
-    //         // Kirim ke API Python
-    //         $response = Http::timeout(10)->post($pythonApiUrl, [
-    //             'image' => $base64,
-    //         ]);
+    //         /* ── 3. PANGGIL API FLASK ─────────────────────────────────────── */
+    //         $flask = Http::timeout(15)
+    //             ->post($pythonApiUrl, ['image' => $base64]);
 
-    //         if (!$response->successful()) {
+    //         if (!$flask->successful()) {
     //             return response()->json([
-    //                 'status' => 'error',
-    //                 'message' => 'Gagal menghubungi API Python.',
-    //                 'error' => $response->body(),
+    //                 'status'  => 'error',
+    //                 'message' => 'Gagal terhubung ke layanan pengenalan wajah.',
     //             ], 500);
     //         }
 
-    //         $data = $response->json();
-    //         $confidence = round($data['confidence'] ?? 999, 2);
-    //         $nis = $data['nis'] ?? null;
+    //         $res        = $flask->json();                     // {match, nis?, confidence?, message?}
+    //         $isMatch    = $res['match'] ?? false;
+    //         $nis        = $res['nis'] ?? null;
+    //         $confidence = isset($res['confidence']) ? (float) $res['confidence'] : null;
+    //         $message    = $res['message'] ?? '';
 
-    //         // Jika pengenalan tidak sukses atau confidence rendah
-    //         if (($data['status'] !== 'success') || !$nis) {
+    //         /* ── 4. TANGANI FACE NOT FOUND / UNRECOGNIZED ────────────────── */
+    //         if (!$isMatch) {
+    //             if (str_contains(Str::lower($message), 'terdeteksi')) {      // “Wajah tidak terdeteksi”
+    //                 return response()->json([
+    //                     'status'  => 'face_not_found',
+    //                     'message' => $message ?: 'Wajah tidak terdeteksi.',
+    //                 ]);
+    //             }
+
     //             return response()->json([
-    //                 'status' => 'unrecognized',
-    //                 'message' => 'Wajah tidak dikenali.',
-    //                 'confidence' => $confidence,
-    //             ], 200);
+    //                 'status'      => 'unrecognized',
+    //                 'message'     => $message ?: 'Wajah tidak dikenali.',
+    //                 'confidence'  => $confidence,
+    //             ]);
     //         }
 
-    //         if ($confidence > $confidenceThreshold) {
+    //         /* ── 5. OPSIONAL: LOGIKA LOW CONFIDENCE (jika ingin) ───────────
+    //         if ($confidence !== null && $confidence >= 60) {
     //             return response()->json([
-    //                 'status' => 'low_confidence',
-    //                 'message' => 'Confidence terlalu rendah untuk validasi.',
+    //                 'status'     => 'low_confidence',
+    //                 'message'    => 'Confidence rendah.',
+    //                 'nis'        => $nis,
     //                 'confidence' => $confidence,
-    //             ], 200);
+    //             ]);
     //         }
+    //         ----------------------------------------------------------------*/
 
-    //         // Validasi NIS & siswa
+    //         /* ── 6. VALIDASI NIS & RELASI KELAS/JADWAL ───────────────────── */
     //         $siswa = Siswa::where('nis', $nis)->first();
     //         if (!$siswa) {
     //             return response()->json([
-    //                 'status' => 'nis_not_found',
-    //                 'message' => 'NIS tidak ditemukan di database.',
-    //                 'nis' => $nis,
-    //                 'confidence' => $confidence,
+    //                 'status'  => 'nis_not_found',
+    //                 'message' => "NIS ($nis) tidak ditemukan.",
     //             ], 404);
     //         }
 
-    //         // Ambil data kelas siswa terbaru
     //         $siswaKelas = Siswa_Kelas::where('siswa_id', $siswa->id)->latest()->first();
     //         if (!$siswaKelas) {
     //             return response()->json([
-    //                 'status' => 'no_class_data',
+    //                 'status'  => 'no_class_data',
     //                 'message' => 'Data kelas siswa tidak ditemukan.',
     //             ], 404);
     //         }
 
-    //         // Validasi jadwal & kelas
-    //         $jadwal = Jadwal::with('mapel', 'kelas')->find($request->jadwal_id);
+    //         $jadwal = Jadwal::with('mapel','kelas')->find($request->jadwal_id);
     //         if (!$jadwal || $siswaKelas->kelas_id !== $jadwal->kelas_id) {
     //             return response()->json([
-    //                 'status' => 'invalid_class',
-    //                 'message' => 'Siswa tidak terdaftar di kelas sesuai jadwal.',
-    //                 'data' => [
-    //                     'siswa' => $siswa->nama_siswa,
-    //                     'kelas_jadwal' => $jadwal->kelas->nama_kelas ?? '-',
-    //                     'kelas_siswa' => $siswaKelas->kelas->nama_kelas ?? '-',
-    //                 ]
+    //                 'status'  => 'invalid_class',
+    //                 'message' => 'Siswa tidak terdaftar di kelas jadwal ini.',
     //             ], 403);
     //         }
 
-    //         // Cek apakah sudah presensi hari ini
-    //         $sudahPresensi = Presensi::where('siswa_kelas_id', $siswaKelas->id)
+    //         /* ── 7. CEK DUPLIKAT PRESENSI ────────────────────────────────── */
+    //         $already = Presensi::where('siswa_kelas_id', $siswaKelas->id)
     //             ->where('jadwal_id', $jadwal->id)
-    //             ->whereDate('waktu_presensi', now()->toDateString())
+    //             ->whereDate('waktu_presensi', today())
     //             ->exists();
 
-    //         if ($sudahPresensi) {
+    //         if ($already) {
     //             return response()->json([
-    //                 'status' => 'already_marked',
-    //                 'message' => 'Presensi sudah dicatat sebelumnya.',
-    //                 'data' => [
-    //                     'siswa' => $siswa->nama_siswa,
-    //                     'confidence' => $confidence,
-    //                 ]
-    //             ], 200);
+    //                 'status'  => 'already_marked',
+    //                 'message' => 'Presensi sudah dicatat.',
+    //             ], 409);
     //         }
 
-    //         // Simpan presensi
+    //         /* ── 8. SIMPAN PRESENSI ──────────────────────────────────────── */
     //         $presensi = Presensi::create([
-    //             'jadwal_id' => $jadwal->id,
+    //             'jadwal_id'      => $jadwal->id,
     //             'siswa_kelas_id' => $siswaKelas->id,
     //             'waktu_presensi' => now(),
-    //             'status' => 'Hadir',
-    //             'catatan' => 'Presensi otomatis via Face Recognition',
+    //             'status'         => 'Hadir',
+    //             'catatan'        => 'Presensi otomatis via Face Recognition',
     //         ]);
 
     //         return response()->json([
-    //             'status' => 'success',
-    //             'message' => 'Presensi berhasil dicatat.',
-    //             'data' => [
-    //                 'siswa' => $siswa->nama_siswa,
-    //                 'kelas' => $jadwal->kelas->nama_kelas ?? '-',
-    //                 'mapel' => $jadwal->mapel->nama_mapel ?? '-',
-    //                 'waktu' => $presensi->waktu_presensi->format('d M Y H:i:s'),
+    //             'status'  => 'success',
+    //             'message' => 'Presensi berhasil dicatat!',
+    //             'data'    => [
+    //                 'siswa'      => $siswa->nama_siswa,
+    //                 'kelas'      => $jadwal->kelas->nama_kelas,
+    //                 'mapel'      => $jadwal->mapel->nama_mapel,
+    //                 'waktu'      => $presensi->waktu_presensi->format('d M Y H:i:s'),
     //                 'confidence' => $confidence,
-    //                 'status' => 'Hadir'
-    //             ]
-    //         ], 200);
+    //             ],
+    //         ], 201);
 
-    //     } catch (\Exception $e) {
+    //     } catch (\Throwable $e) {
+    //         Log::error('Presensi otomatis error', ['msg'=>$e->getMessage()]);
     //         return response()->json([
-    //             'status' => 'error',
-    //             'message' => 'Gagal memproses presensi otomatis.',
-    //             'error' => $e->getMessage(),
+    //             'status'  => 'error',
+    //             'message' => 'Terjadi kesalahan internal.',
     //         ], 500);
     //     }
     // }
 
-
-    public function recognizeAndMark(Request $request)
+    public function markAttendance(Request $request)
     {
-        $pythonApiUrl = 'http://127.0.0.1:5000/recognize';
-
-        // Amang batas jarak untuk pengenalan wajah. Nilai lebih rendah = lebih baik.
-        // Sesuaikan nilai ini berdasarkan kalibrasi model Python Anda.
-        // Misalnya:
-        // - Jarak <= 70: Dianggap 'Hadir' (recognized_threshold)
-        // - Jarak > 70 dan <= 90: Dianggap 'low_confidence' (low_confidence_threshold)
-        // - Jarak > 90: Dianggap 'unrecognized'
-        $recognizedThreshold = 70;
-        $lowConfidenceThreshold = 90;
-
-        // Validasi input dari frontend
         $request->validate([
+            'siswa_nis' => 'required|exists:siswa,nis',
             'jadwal_id' => 'required|exists:jadwal,id',
-            'image' => 'required|string', // Pastikan 'image' selalu ada dari frontend kamera
+            'status' => 'nullable|in:Hadir,Sakit,Izin,Alfa',
+            'waktu_presensi' => 'nullable',
+            'catatan' => 'nullable|string',
         ]);
 
+        $jadwalId = $request->input('jadwal_id');
+        $jadwal = Jadwal::with('mapel', 'kelas')->find($jadwalId);
+
+        // Cek jika siswa NIS kosong → Wajah tidak dikenali
+        if (!$request->filled('siswa_nis')) {
+            $presensi = new Presensi();
+            $presensi->jadwal_id = $jadwalId;
+            $presensi->siswa_kelas_id = null;
+            $presensi->waktu_presensi = now();
+            $presensi->status = null;
+            $presensi->catatan = 'Wajah tidak dikenali';
+            $presensi->save();
+
+            return response()->json([
+                'status' => 'not_recognized',
+                'message' => 'Wajah tidak dikenali.'
+            ]);
+        }
+
+        $siswa = Siswa::where('nis', $request->siswa_nis)->first();
+        if (!$siswa) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Siswa tidak ditemukan.'
+            ]);
+        }
+
+        $siswaKelas = Siswa_Kelas::where('siswa_id', $siswa->id)->latest()->first();
+        if (!$siswaKelas) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Data kelas siswa tidak ditemukan.'
+            ]);
+        }
+
+        $siswaKelasId = $siswaKelas->id;
+
+        $sudahPresensi = Presensi::where('siswa_kelas_id', $siswaKelasId)
+            ->where('jadwal_id', $jadwalId)
+            ->whereDate('waktu_presensi', now()->toDateString())
+            ->exists();
+
+        if ($sudahPresensi) {
+            return response()->json([
+                'status' => 'already_marked',
+                'message' => 'Presensi sudah tercatat sebelumnya.',
+                'data' => [
+                    'siswa' => $siswa->nama_siswa
+                ]
+            ]);
+        }
+
+        $isInClass = Siswa_Kelas::where('siswa_id', $siswa->id)
+            ->where('kelas_id', $jadwal->kelas_id)
+            ->exists();
+
+        // ❌ Salah kelas
+        if (!$isInClass) {
+            $presensi = new Presensi();
+            $presensi->jadwal_id = $jadwalId;
+            $presensi->siswa_kelas_id = null;
+            $presensi->waktu_presensi = now();
+            $presensi->status = null;
+            $presensi->catatan = 'Salah kelas';
+            $presensi->save();
+
+            return response()->json([
+                'status' => 'not_allowed',
+                'nama_siswa' => $siswa->nama_siswa,
+                'message' => 'Siswa dikenali, tapi tidak terdaftar di kelas pada jadwal ini.'
+            ]);
+        }
+
+        // ✅ Presensi berhasil
         try {
-            // Ambil base64 image dari request (frontend mengirim ini dari canvas)
-            $base64Image = preg_replace('/^data:image\/\w+;base64,/', '', $request->input('image'));
-
-            // Kirim ke API Python untuk pengenalan wajah
-            $response = Http::timeout(15)->post($pythonApiUrl, [ // Timeout diperpanjang sedikit
-                'image' => $base64Image,
-            ]);
-
-            // Cek apakah koneksi ke API Python gagal
-            if (!$response->successful()) {
-                Log::error('Gagal menghubungi API Python: ' . $response->body(), ['status_code' => $response->status()]);
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Gagal terhubung ke layanan pengenalan wajah.',
-                    'detail' => 'Koneksi ke API Python gagal atau ada masalah di sana.' // Pesan lebih user-friendly
-                ], 500);
-            }
-
-            $data = $response->json();
-            $statusFromPython = $data['status'] ?? 'unknown_status';
-            $nis = $data['nis'] ?? null;
-            $confidence = round($data['confidence'] ?? 999, 2); // Confidence dari Python adalah jarak
-
-            // Log respons dari Python untuk debugging
-            Log::info('Respons dari API Python:', $data);
-
-            // === Tentukan Status Berdasarkan Respons Python ===
-            if ($statusFromPython === 'face_not_found') {
-                return response()->json([
-                    'status' => 'face_not_found',
-                    'message' => $data['message'] ?? 'Wajah tidak terdeteksi dalam gambar. Pastikan wajah Anda di tengah frame.',
-                ], 200);
-            }
-
-            if ($statusFromPython === 'unrecognized') {
-                return response()->json([
-                    'status' => 'unrecognized',
-                    'message' => $data['message'] ?? 'Wajah tidak dikenali atau tidak terdaftar. Pastikan Anda adalah siswa yang terdaftar.',
-                    'confidence' => $confidence,
-                ], 200);
-            }
-
-            // Jika statusnya bukan success dari Python, atau NIS kosong
-            if ($statusFromPython !== 'success' || !$nis) {
-                 return response()->json([
-                    'status' => 'unrecognized', // Atau status spesifik jika Python memberikan lebih banyak detail
-                    'message' => $data['message'] ?? 'Pengenalan wajah tidak berhasil.',
-                    'confidence' => $confidence,
-                ], 200);
-            }
-
-            // Jika sampai sini, berarti Python mengembalikan status 'success' (NIS ditemukan)
-            // Sekarang evaluasi confidence (jarak) dari Python
-            if ($confidence >= $lowConfidenceThreshold) {
-                // Jarak terlalu tinggi, berarti confidence rendah (tidak dikenali)
-                return response()->json([
-                    'status' => 'unrecognized',
-                    'message' => 'Wajah terdeteksi tapi tidak dikenali dengan tingkat kepercayaan yang memadai (jarak: ' . $confidence . ').',
-                    'confidence' => $confidence,
-                ], 200);
-            } elseif ($confidence >= $recognizedThreshold && $confidence < $lowConfidenceThreshold) {
-                // Jarak di antara threshold, masih bisa dikenali tapi confidence rendah
-                return response()->json([
-                    'status' => 'low_confidence',
-                    'message' => 'Wajah terdeteksi dengan NIS ' . $nis . ' tapi tingkat kepercayaan rendah (jarak: ' . $confidence . ').',
-                    'nis' => $nis, // Kembalikan NIS agar frontend bisa menampilkan info siswa
-                    'confidence' => $confidence,
-                ], 200);
-            }
-
-            // Jika confidence < recognizedThreshold, berarti pengenalan berhasil (status 'success' dari Python dan jarak bagus)
-
-            // Validasi NIS & siswa di database Laravel
-            $siswa = Siswa::where('nis', $nis)->first();
-            if (!$siswa) {
-                return response()->json([
-                    'status' => 'nis_not_found',
-                    'message' => 'NIS (' . $nis . ') yang dikenali tidak ditemukan di database siswa.',
-                    'nis' => $nis,
-                    'confidence' => $confidence,
-                ], 404);
-            }
-
-            // Ambil data kelas siswa terbaru
-            $siswaKelas = Siswa_Kelas::where('siswa_id', $siswa->id)->latest()->first();
-            if (!$siswaKelas) {
-                return response()->json([
-                    'status' => 'no_class_data',
-                    'message' => 'Data kelas untuk siswa ' . $siswa->nama_siswa . ' tidak ditemukan.',
-                ], 404);
-            }
-
-            // Validasi jadwal & kelas: Pastikan siswa terdaftar di kelas yang sesuai dengan jadwal
-            $jadwal = Jadwal::with('mapel', 'kelas')->find($request->jadwal_id);
-            if (!$jadwal || $siswaKelas->kelas_id !== $jadwal->kelas_id) {
-                return response()->json([
-                    'status' => 'invalid_class',
-                    'message' => 'Siswa ' . $siswa->nama_siswa . ' tidak terdaftar di kelas ' . ($jadwal->kelas->nama_kelas ?? '-') . ' sesuai jadwal.',
-                    'data' => [
-                        'siswa' => $siswa->nama_siswa,
-                        'kelas_jadwal' => $jadwal->kelas->nama_kelas ?? '-',
-                        'kelas_siswa' => $siswaKelas->kelas->nama_kelas ?? '-',
-                        'confidence' => $confidence,
-                    ]
-                ], 403);
-            }
-
-            // Cek apakah siswa sudah presensi untuk jadwal ini hari ini
-            $sudahPresensi = Presensi::where('siswa_kelas_id', $siswaKelas->id)
-                ->where('jadwal_id', $jadwal->id)
-                ->whereDate('waktu_presensi', Carbon::now()->toDateString()) // Menggunakan Carbon
-                ->exists();
-
-            if ($sudahPresensi) {
-                return response()->json([
-                    'status' => 'already_marked',
-                    'message' => 'Presensi siswa ' . $siswa->nama_siswa . ' sudah dicatat sebelumnya untuk jadwal ini.',
-                    'data' => [
-                        'siswa' => $siswa->nama_siswa,
-                        'confidence' => $confidence,
-                    ]
-                ], 200);
-            }
-
-            // Jika semua validasi lolos, simpan presensi
-            $presensi = Presensi::create([
-                'jadwal_id' => $jadwal->id,
-                'siswa_kelas_id' => $siswaKelas->id,
-                'waktu_presensi' => Carbon::now(), // Menggunakan Carbon
-                'status' => 'Hadir',
-                'catatan' => 'Presensi otomatis via Face Recognition',
-            ]);
+            $presensi = new Presensi();
+            $presensi->jadwal_id = $jadwalId;
+            $presensi->siswa_kelas_id = $siswaKelasId;
+            $presensi->waktu_presensi = now();
+            $presensi->status = 'Hadir';
+            $presensi->catatan = $request->input('catatan') ?? 'Presensi via pengenalan wajah';
+            $presensi->save();
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Presensi berhasil dicatat!',
+                'message' => 'Presensi berhasil dicatat.',
                 'data' => [
                     'siswa' => $siswa->nama_siswa,
                     'kelas' => $jadwal->kelas->nama_kelas ?? '-',
                     'mapel' => $jadwal->mapel->nama_mapel ?? '-',
-                    'waktu' => $presensi->waktu_presensi->format('d M Y H:i:s'),
-                    'confidence' => $confidence,
+                    'waktu' => now()->format('d M Y H:i:s'),
                     'status' => 'Hadir'
                 ]
-            ], 200);
-
-        } catch (\Exception $e) {
-            // Log error yang tidak terduga
-            Log::error('Kesalahan tak terduga saat memproses presensi otomatis: ' . $e->getMessage(), [
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString(),
             ]);
+        } catch (\Exception $e) {
+            // ❌ Gagal menyimpan presensi
+            $presensi = new Presensi();
+            $presensi->jadwal_id = $jadwalId;
+            $presensi->siswa_kelas_id = $siswaKelasId ?? null;
+            $presensi->waktu_presensi = now();
+            $presensi->status = null;
+            $presensi->catatan = 'Error saat mencatat presensi';
+            $presensi->save();
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Terjadi kesalahan internal server. Silakan coba lagi nanti.',
-                // Jangan tampilkan $e->getMessage() di produksi untuk keamanan
-                // 'debug_error' => $e->getMessage(),
-            ], 500);
+                'message' => 'Gagal menyimpan presensi.'
+            ]);
         }
     }
+
+
 }

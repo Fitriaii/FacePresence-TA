@@ -118,35 +118,32 @@ class GuruDashboardController extends Controller
         // 12. Riwayat presensi (5 terakhir)
         $riwayatPresensi = collect();
 
-        // Ambil semua siswa dari presensi yang berkaitan dengan mapel guru
-        $siswaIds = Presensi::whereIn('jadwal_id', function ($query) use ($mapelIds) {
-                $query->select('id')
-                    ->from('jadwal')
-                    ->whereIn('mapel_id', $mapelIds);
+        $presensis = Presensi::with(['siswa_kelas.siswa', 'jadwal.kelas'])
+            ->whereIn('jadwal_id', function ($query) use ($mapelIds) {
+                $query->select('id')->from('jadwal')->whereIn('mapel_id', $mapelIds);
             })
-            ->pluck('siswa_kelas_id')
-            ->unique();
+            ->orderByDesc('waktu_presensi')
+            ->get()
+            ->unique('siswa_kelas_id') // satu data terbaru per siswa
+            ->take(10); // hanya 10 siswa terakhir
 
-        foreach ($siswaIds as $siswaKelasId) {
-            $presensiSiswa = Presensi::with(['siswa_kelas.siswa', 'jadwal.kelas'])
-                ->where('siswa_kelas_id', $siswaKelasId)
+        foreach ($presensis as $latestPresensi) {
+            $siswa = $latestPresensi->siswa_kelas->siswa ?? null;
+            $kelas = $latestPresensi->jadwal->kelas ?? null;
+            $siswaKelasId = $latestPresensi->siswa_kelas_id;
+
+            // Ambil seluruh presensi siswa ini untuk mapel yang diampu
+            $presensiSiswa = Presensi::where('siswa_kelas_id', $siswaKelasId)
                 ->whereIn('jadwal_id', function ($query) use ($mapelIds) {
                     $query->select('id')->from('jadwal')->whereIn('mapel_id', $mapelIds);
                 })
-                ->orderByDesc('waktu_presensi')
-                ->limit(5)
                 ->get();
 
-            if ($presensiSiswa->isEmpty()) continue;
-
-            $siswa = $presensiSiswa->first()->siswa_kelas->siswa;
-            $kelas = $presensiSiswa->first()->jadwal->kelas;
-            $latestPresensi = $presensiSiswa->first();
             $tanggal = Carbon::parse($latestPresensi->waktu_presensi);
 
             $riwayatPresensi->push((object)[
-                'nama' => $siswa->nama_siswa,
-                'nis' => $siswa->nis,
+                'nama' => $siswa->nama_siswa ?? '-',
+                'nis' => $siswa->nis ?? '-',
                 'kelas' => $kelas->nama_kelas ?? '-',
                 'Hadir' => $presensiSiswa->where('status', 'Hadir')->count(),
                 'Izin' => $presensiSiswa->where('status', 'Izin')->count(),

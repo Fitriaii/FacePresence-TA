@@ -156,13 +156,12 @@ class KelasController extends Controller
     {
         $request->validate([
             'nama_kelas' => 'required|string|max:255',
-            'jenis_kelas' => 'required|string|max:255|unique:kelas,jenis_kelas,' . $room->id, // pengecualian untuk kelas yang sedang diupdate
+            'jenis_kelas' => 'required|string|max:255', // pengecualian untuk kelas yang sedang diupdate
             'tingkatan_kelas' => 'required|string|max:255',
             'guru' => 'required|exists:guru,id',
         ], [
             'nama_kelas.required' => 'Nama kelas wajib diisi.',
-            'jenis_kelas.required' => 'Jenis kelas wajib diisi.',
-            'jenis_kelas.unique' => 'Jenis kelas sudah digunakan.',
+            // 'jenis_kelas.required' => 'Jenis kelas wajib diisi.',,
             'tingkatan_kelas.required' => 'Tingkatan kelas wajib diisi.',
             'guru.required' => 'Guru pengampu wajib dipilih.',
             'guru.exists' => 'Guru yang dipilih tidak ditemukan.',
@@ -195,13 +194,23 @@ class KelasController extends Controller
      */
     public function destroy(Kelas $room)
     {
-        $room->delete();
-        return redirect()->route('room.index')->with([
-            'status' => 'success',
-            'code' => 200,
-            'message' => 'Kelas berhasil dihapus.'
-        ]);
+        try {
+            $room->delete();
+
+            return redirect()->route('room.index')->with([
+                'status' => 'success',
+                'code' => 200,
+                'message' => 'Kelas berhasil dihapus.'
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->route('room.index')->with([
+                'status' => 'error',
+                'code' => 500,
+                'message' => 'Terjadi kesalahan saat menghapus kelas: ' . $e->getMessage()
+            ]);
+        }
     }
+
 
 
 }

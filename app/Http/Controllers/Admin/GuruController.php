@@ -105,23 +105,56 @@ class GuruController extends Controller
     {
         $validated = $request->validate([
             'nama_guru' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8',
-            'nip' => 'required|string|max:255|unique:guru',
+            'nip' => 'required|string|max:255|unique:guru,nip',
             'alamat' => 'required|string|max:255',
             'jenis_kelamin' => 'required|in:Laki-Laki,Perempuan',
             'status_keaktifan' => 'required|in:Aktif,Tidak Aktif',
             'no_hp' => 'required|string|max:15',
+        ], [
+            'nama_guru.required' => 'Nama guru wajib diisi.',
+            'nama_guru.max' => 'Nama guru maksimal 255 karakter.',
+
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.max' => 'Email maksimal 255 karakter.',
+            'email.unique' => 'Email sudah digunakan oleh pengguna lain.',
+
+            'password.required' => 'Kata sandi wajib diisi.',
+            'password.min' => 'Kata sandi minimal 8 karakter.',
+
+            'nip.required' => 'NIP wajib diisi.',
+            'nip.unique' => 'NIP sudah digunakan.',
+            'nip.max' => 'NIP maksimal 255 karakter.',
+
+            'alamat.required' => 'Alamat wajib diisi.',
+            'alamat.max' => 'Alamat maksimal 255 karakter.',
+
+            'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
+            'jenis_kelamin.in' => 'Jenis kelamin harus Laki-Laki atau Perempuan.',
+
+            'status_keaktifan.required' => 'Status keaktifan wajib dipilih.',
+            'status_keaktifan.in' => 'Status keaktifan harus Aktif atau Tidak Aktif.',
+
+            'no_hp.required' => 'Nomor HP wajib diisi.',
+            'no_hp.max' => 'Nomor HP maksimal 15 digit.',
         ]);
+
         DB::beginTransaction();
 
         try {
+            // Simpan ke tabel users
             $user = new User();
             $user->name = $validated['nama_guru'];
             $user->email = $validated['email'];
             $user->password = Hash::make($validated['password']);
             $user->save();
+
+            // Berikan role guru
             $user->assignRole('guru');
+
+            // Simpan ke tabel guru
             $guru = new Guru();
             $guru->user_id = $user->id;
             $guru->nama_guru = $validated['nama_guru'];
@@ -131,25 +164,27 @@ class GuruController extends Controller
             $guru->jenis_kelamin = $validated['jenis_kelamin'];
             $guru->status_keaktifan = $validated['status_keaktifan'];
             $guru->save();
+
             DB::commit();
-            if ($guru->id) {
-                return redirect()->route('guru.index')->with([
-                    'status' => 'success',
-                    'code' => 200,
-                    'message' => "Guru {$validated['nama_guru']} berhasil ditambahkan."
-                ]);
-            } else {
-                throw new \Exception("Gagal menyimpan data guru");
-            }
+
+            return redirect()->route('guru.index')->with([
+                'status' => 'success',
+                'code' => 200,
+                'message' => "Guru {$validated['nama_guru']} berhasil ditambahkan."
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error saat menyimpan data guru: ' . $e->getMessage());
+            Log::error('Gagal menyimpan data guru: ' . $e->getMessage());
 
-            return redirect()->back()->withInput()->withErrors([
-                'error' => 'Gagal menyimpan data guru: ' . $e->getMessage()
+            dd($guru);
+            return redirect()->back()->withInput()->with([
+                'status' => 'error',
+                'code' => 500,
+                'message' => 'Gagal menyimpan data guru. Silakan coba lagi.'
             ]);
         }
     }
+
 
 
 
@@ -208,6 +243,33 @@ class GuruController extends Controller
             'jenis_kelamin' => 'required|in:Laki-Laki,Perempuan',
             'status_keaktifan' => 'required|in:Aktif,Tidak Aktif',
             'password' => 'nullable|string|min:8',
+        ], [
+            'nama_guru.required' => 'Nama guru wajib diisi.',
+            'nama_guru.max' => 'Nama guru maksimal 255 karakter.',
+
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.max' => 'Email maksimal 255 karakter.',
+            'email.unique' => 'Email sudah digunakan oleh pengguna lain.',
+
+            'password.required' => 'Kata sandi wajib diisi.',
+            'password.min' => 'Kata sandi minimal 8 karakter.',
+
+            'nip.required' => 'NIP wajib diisi.',
+            'nip.unique' => 'NIP sudah digunakan.',
+            'nip.max' => 'NIP maksimal 255 karakter.',
+
+            'alamat.required' => 'Alamat wajib diisi.',
+            'alamat.max' => 'Alamat maksimal 255 karakter.',
+
+            'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
+            'jenis_kelamin.in' => 'Jenis kelamin harus Laki-Laki atau Perempuan.',
+
+            'status_keaktifan.required' => 'Status keaktifan wajib dipilih.',
+            'status_keaktifan.in' => 'Status keaktifan harus Aktif atau Tidak Aktif.',
+
+            'no_hp.required' => 'Nomor HP wajib diisi.',
+            'no_hp.max' => 'Nomor HP maksimal 15 digit.',
         ]);
 
         DB::beginTransaction();
@@ -251,17 +313,29 @@ class GuruController extends Controller
      */
     public function destroy(Guru $guru)
     {
-        if ($guru->user) {
-            $guru->user->delete();
-        }
-        $guru->delete();
+        try {
+            // Hapus relasi user jika ada
+            if ($guru->user) {
+                $guru->user->delete();
+            }
 
-        return redirect()->route('guru.index')->with([
-            'status' => 'success',
-            'code' => 200,
-            'message' => 'Guru berhasil dihapus.'
-        ]);
+            // Hapus data guru
+            $guru->delete();
+
+            return redirect()->route('guru.index')->with([
+                'status' => 'success',
+                'code' => 200,
+                'message' => 'Guru berhasil dihapus.'
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->route('guru.index')->with([
+                'status' => 'error',
+                'code' => 500,
+                'message' => 'Terjadi kesalahan saat menghapus guru: ' . $e->getMessage()
+            ]);
+        }
     }
+
 
 
 

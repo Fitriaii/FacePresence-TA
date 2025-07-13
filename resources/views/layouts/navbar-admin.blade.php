@@ -1,4 +1,4 @@
-<header class="z-10 py-2 bg-white border-b border-gray-200 shadow-sm">
+<header class="relative z-30 py-2 bg-white border-b border-gray-200 shadow-sm">
     <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
 

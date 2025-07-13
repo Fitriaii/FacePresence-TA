@@ -1,5 +1,5 @@
 <aside
-    class="fixed inset-y-0 z-30 flex-shrink-0 w-64 mt-16 overflow-y-auto bg-white md:hidden"
+    class="fixed inset-y-0 z-50 flex-shrink-0 w-64 mt-16 overflow-y-auto bg-white md:hidden"
     x-show="isSideMenuOpen"
     x-cloak
     x-transition:enter="transition ease-in-out duration-150"
@@ -10,7 +10,7 @@
     x-transition:leave-end="transform -translate-x-full"
     >
     <!-- Logo Section -->
-    <div class="flex justify-center px-6 mt-4 mb-8">
+    <div class="flex justify-center px-6 mt-8 mb-8">
         <a class="text-2xl font-bold tracking-tight text-purple-600 transition-colors duration-200 hover:text-purple-700" href="#">
             PresenSee
         </a>

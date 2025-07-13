@@ -43,5 +43,41 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
+/* Untuk Firefox */
+/* === Firefox === */
+html {
+    scrollbar-width: thin;
+    scrollbar-color: #999 transparent; /* thumb: abu-abu netral, track: transparan */
+  }
+
+  html.dark {
+    scrollbar-color: #666 transparent; /* lebih gelap di dark mode */
+  }
+
+  /* === Chrome, Edge, Opera, Brave === */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #999; /* abu netral */
+    border-radius: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  html.dark ::-webkit-scrollbar-thumb {
+    background-color: #666; /* lebih gelap untuk dark */
+  }
+
+  html.dark ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+
+
 
 

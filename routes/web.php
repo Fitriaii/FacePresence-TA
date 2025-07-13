@@ -84,7 +84,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/presensi/{id}/capture', [PresensiController::class, 'showCaptureForm'])->name('presensi.capture');
         Route::post('/siswa-recognize', [PresensiController::class, 'recognizeAndMark'])->name('siswa.recognize');
-        // Route::post('/mark-attendance', [PresensiController::class, 'markAttendance'])->name('mark.attendance');
+        Route::post('/mark-attendance', [PresensiController::class, 'markAttendance'])->name('mark.attendance');
 
         Route::resource('daftarSiswa', DaftarSiswaController::class);
         Route::resource('jadwalAjar', JadwalMengajarController::class);

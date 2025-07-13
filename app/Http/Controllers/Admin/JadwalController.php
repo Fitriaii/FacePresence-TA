@@ -125,8 +125,8 @@ class JadwalController extends Controller
             'kelas_id' => 'required|exists:kelas,id',
             'mapel_id' => 'required|exists:mapel,id',
             'hari' => 'required|string|max:255',
-            'jam_mulai' => 'required',
-            'jam_selesai' => 'required',
+            'jam_mulai' => 'required|date_format:H:i',
+            'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
         ], [
             'kelas_id.required' => 'Kelas wajib diisi.',
             'kelas_id.exists' => 'Kelas yang dipilih tidak ditemukan.',
@@ -135,7 +135,44 @@ class JadwalController extends Controller
             'hari.required' => 'Hari wajib diisi.',
             'jam_mulai.required' => 'Jam mulai wajib diisi.',
             'jam_selesai.required' => 'Jam selesai wajib diisi.',
+            'jam_selesai.after' => 'Jam selesai harus setelah jam mulai.',
         ]);
+
+        // Cek duplikasi jadwal yang identik
+            $duplikat = Jadwal::where('kelas_id', $request->kelas_id)
+                ->where('mapel_id', $request->mapel_id)
+                ->where('hari', $request->hari)
+                ->where('jam_mulai', $request->jam_mulai)
+                ->where('jam_selesai', $request->jam_selesai)
+                ->exists();
+
+            if ($duplikat) {
+                return redirect()->route('jadwal.index')->with([
+                    'status' => 'error',
+                    'message' => 'Jadwal ini sudah ada dan tidak boleh diduplikasi.'
+                ]);
+            }
+
+            // Cek jadwal bentrok waktu
+            $bentrok = Jadwal::where('kelas_id', $request->kelas_id)
+                ->where('hari', $request->hari)
+                ->where(function ($query) use ($request) {
+                    $query->whereBetween('jam_mulai', [$request->jam_mulai, $request->jam_selesai])
+                        ->orWhereBetween('jam_selesai', [$request->jam_mulai, $request->jam_selesai])
+                        ->orWhere(function ($q) use ($request) {
+                            $q->where('jam_mulai', '<=', $request->jam_mulai)
+                            ->where('jam_selesai', '>=', $request->jam_selesai);
+                        });
+                })
+            ->exists();
+
+            if ($bentrok) {
+                return redirect()->route('jadwal.index')->with([
+                    'status' => 'error',
+                    'message' => 'Waktu jadwal bentrok dengan jadwal lain di kelas ini pada hari yang sama.'
+                ]);
+            }
+
 
         try {
             $jadwal = new Jadwal();
@@ -145,6 +182,7 @@ class JadwalController extends Controller
             $jadwal->jam_mulai = $request->jam_mulai;
             $jadwal->jam_selesai = $request->jam_selesai;
             $jadwal->save();
+
             return redirect()->route('jadwal.index')->with([
                 'status' => 'success',
                 'message' => 'Jadwal berhasil ditambahkan.'
@@ -231,13 +269,23 @@ class JadwalController extends Controller
      */
     public function destroy(Jadwal $jadwal)
     {
-        $jadwal->delete();
-        return redirect()->route('jadwal.index')->with([
-            'status' => 'success',
-            'code' => 200,
-            'message' => 'Jadwal berhasil dihapus.'
-        ]);
+        try {
+            $jadwal->delete();
+
+            return redirect()->route('jadwal.index')->with([
+                'status' => 'success',
+                'code' => 200,
+                'message' => 'Jadwal berhasil dihapus.'
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->route('jadwal.index')->with([
+                'status' => 'error',
+                'code' => 500,
+                'message' => 'Terjadi kesalahan saat menghapus jadwal: ' . $e->getMessage()
+            ]);
+        }
     }
+
 
     public function exportJadwal()
     {

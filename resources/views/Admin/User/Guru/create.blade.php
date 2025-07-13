@@ -165,7 +165,7 @@
                             class="w-full px-4 py-3 text-sm transition-colors duration-200 border border-gray-300 rounded-lg outline-none hover:border-purple-400 dark:bg-white dark:text-gray-900 dark:border-gray-300 focus:ring-purple-500/20 focus:border-purple-500"
                         >
                             <option value="" disabled selected>Pilih jenis kelamin</option>
-                            <option value="Laki-laki" {{ old('jenis_kelamin', isset($guru) ? $guru->jenis_kelamin : '') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                            <option value="Laki-Laki" {{ old('jenis_kelamin', isset($guru) ? $guru->jenis_kelamin : '') == 'Laki-Laki' ? 'selected' : '' }}>Laki-Laki</option>
                             <option value="Perempuan" {{ old('jenis_kelamin', isset($guru) ? $guru->jenis_kelamin : '') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
                         </select>
                     </div>
